@@ -120,9 +120,7 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
   searchValue,
 }) => {
   const hasSelectedFrame = frames.some(
-    (frame) =>
-      selectedFrame?.file === frame.file &&
-      selectedFrame?.lineNumber === frame.lineNumber
+    (frame) => JSON.stringify(frame) === JSON.stringify(selectedFrame)
   );
 
   return (
