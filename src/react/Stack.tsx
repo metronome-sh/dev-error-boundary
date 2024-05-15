@@ -22,25 +22,30 @@ export const Stack: FunctionComponent<StackProps> = ({
   const searchValue = appDirectory.split("/").slice(0, -1).join("/");
 
   const groupedStack = useMemo(() => {
-    return stack.reduce((acc: stackTraceParser.StackFrame[][], frame, index) => {
-      const currentFile = frame.file || "";
-      const prevFile = index > 0 ? stack[index - 1].file || "" : "";
+    return stack.reduce(
+      (acc: stackTraceParser.StackFrame[][], frame, index) => {
+        const currentFile = frame.file || "";
+        const prevFile = index > 0 ? stack[index - 1].file || "" : "";
 
-      const isNodeModule = currentFile.includes("node_modules");
-      const isPrevNodeModule = prevFile.includes("node_modules");
+        const isNodeModule = currentFile.includes("node_modules");
+        const isPrevNodeModule = prevFile.includes("node_modules");
 
-      if (isNodeModule && isPrevNodeModule) {
-        acc[acc.length - 1].push(frame);
-      } else {
-        acc.push([frame]);
-      }
+        if (isNodeModule && isPrevNodeModule) {
+          acc[acc.length - 1].push(frame);
+        } else {
+          acc.push([frame]);
+        }
 
-      return acc;
-    }, []);
+        return acc;
+      },
+      []
+    );
   }, [stack]);
 
   const expandAllNodeModules = useCallback(() => {
-    setExpandedIdxs((prev) => (prev.length === 0 ? stack.map((_, i) => i) : []));
+    setExpandedIdxs((prev) =>
+      prev.length === 0 ? stack.map((_, i) => i) : []
+    );
   }, [stack]);
 
   return (
@@ -115,7 +120,9 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
   searchValue,
 }) => {
   const hasSelectedFrame = frames.some(
-    (frame) => selectedFrame?.file === frame.file && selectedFrame?.lineNumber === frame.lineNumber
+    (frame) =>
+      selectedFrame?.file === frame.file &&
+      selectedFrame?.lineNumber === frame.lineNumber
   );
 
   return (
@@ -143,7 +150,11 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
                   isExpanded ? "mt-transform mt-rotate-180" : ""
                 )}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                />
               </svg>
             </span>
           </span>
@@ -187,13 +198,16 @@ const Frame: FunctionComponent<FrameProps> = ({
       <button
         className={cn(
           "mt-p-4 mt-w-full mt-text-left",
-          selectedFrame?.file === frame.file && selectedFrame?.lineNumber === frame.lineNumber
+          selectedFrame?.file === frame.file &&
+            selectedFrame?.lineNumber === frame.lineNumber
             ? "mt-bg-red-600 mt-text-white"
             : "hover:mt-bg-gray-100 mt-text-gray-700"
         )}
         onClick={() => onSelectFrame(frame)}
       >
-        <div className="mt-text-sm mt-break-words">{frame.file?.replace(searchValue, "")}</div>
+        <div className="mt-text-sm mt-break-words">
+          {frame.file?.replace(searchValue, "")}
+        </div>
       </button>
     </li>
   );

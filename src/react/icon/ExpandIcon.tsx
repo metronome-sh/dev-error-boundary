@@ -1,7 +1,9 @@
 import { FunctionComponent, SVGProps } from "react";
 import { cn } from "../cn";
 
-export const ExpandIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (props) => {
+export const ExpandIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
+  props
+) => {
   const { className, ...rest } = props;
 
   return (
@@ -11,7 +13,7 @@ export const ExpandIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (props) =>
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn("mt-w-6 mt-h-6", className)}
+      className={cn("mt-w-4 mt-h-4", className)}
       {...rest}
     >
       <path
