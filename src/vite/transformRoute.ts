@@ -32,6 +32,7 @@ export function transformRoute({
 
   const magicString = new MagicString(code, { filename: id });
 
+  // prettier-ignore
   const importStr = 'import { withErrorBoundary } from "@metronome-sh/dev-error-boundary/react";\n';
 
   const stylesStr = 'import "@metronome-sh/dev-error-boundary/styles";';
@@ -60,7 +61,9 @@ export function transformRoute({
         } = withErrorBoundary(${appDirectoryStr}, function ${
           node.declaration.id.name
         }() ${declarationCode.substring(declarationCode.indexOf("{"))});\n`;
-      } else if (node.declaration.declarations[0].init.type === "ArrowFunctionExpression") {
+      } else if (
+        node.declaration.declarations[0].init.type === "ArrowFunctionExpression"
+      ) {
         // Wrap arrow function with withErrorBoundary
         declarationCode = `const ${
           node.declaration.declarations[0].id.name
@@ -78,12 +81,13 @@ export function transformRoute({
   });
 
   if (!errorBoundaryFound) {
-    magicString.append(`\nexport const ErrorBoundary = withErrorBoundary(${appDirectoryStr});\n`);
+    magicString.append(
+      `\nexport const ErrorBoundary = withErrorBoundary(${appDirectoryStr});\n`
+    );
   }
 
   return {
     code: magicString.toString(),
     map: magicString.generateMap({ hires: true }),
-    id,
   };
 }

@@ -25,6 +25,18 @@ export const viteConfig = {
   platform: "node",
 };
 
+export const serverConfig = {
+  ...commonConfig,
+  entryPoints: ["src/server/server.ts"],
+  format: "esm",
+  outfile: "dist/server.js",
+  platform: "node",
+};
+
 (async () => {
-  await Promise.all([build(reactConfig), build(viteConfig)]);
+  await Promise.all([
+    build(reactConfig),
+    build(viteConfig),
+    build(serverConfig),
+  ]);
 })();

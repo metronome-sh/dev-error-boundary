@@ -4,9 +4,13 @@ import { ERROR_BOUNDARY_ROUTE_PATH } from "../common/constants";
 
 export interface SourceProps {
   frame: stackTraceParser.StackFrame | null;
+  appDirectory: string;
 }
 
-export const Source: FunctionComponent<SourceProps> = ({ frame }) => {
+export const Source: FunctionComponent<SourceProps> = ({
+  appDirectory,
+  frame,
+}) => {
   const [source, setSource] = useState(null);
 
   useEffect(() => {
@@ -71,12 +75,26 @@ export const Source: FunctionComponent<SourceProps> = ({ frame }) => {
           </span>
         </div>
       ) : (
-        <div className="mt-h-full mt-overflow-scroll">
-          <div
-            className="mt-w-full *:mt-py-3 *:!mt-bg-transparent mt-bg-white *:mt-w-full [&>pre]:mt-w-full [&>pre]:mt-min-w-fit"
-            data-error-code-container="true"
-            dangerouslySetInnerHTML={{ __html: source }}
-          />
+        <div className="mt-h-full mt-relative">
+          <div className="mt-absolute mt-top-0 mt-inset-x-0 mt-bg-white mt-border-b mt-z-10 mt-h-7 mt-flex mt-items-center mt-justify-end mt-px-4 mt-w-full">
+            <span
+              className="mt-text-gray-400 mt-font-mono mt-truncate mt-rtl"
+              style={{ direction: "rtl" }}
+            >
+              {frame?.file?.replace(appDirectory, "").replace(/^\//, "")}
+              <span className="mt-text-transparent">:</span>
+              <span className="mt-font-mono mt-text-xs">
+                {frame?.lineNumber}:{frame?.column}
+              </span>
+            </span>
+          </div>
+          <div className="mt-h-full mt-overflow-scroll mt-">
+            <div
+              className="mt-w-full *:mt-py-3 *:!mt-bg-transparent mt-bg-white *:mt-w-full [&>pre]:mt-w-full [&>pre]:mt-min-w-fit"
+              data-error-code-container="true"
+              dangerouslySetInnerHTML={{ __html: source }}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -1,8 +1,9 @@
 import { ErrorResponse as RemixErrorResponse } from "@remix-run/server-runtime";
 import { FunctionComponent } from "react";
+import { DevErrorBoudaryErrorResponse } from "./useDevBoundaryError";
 
 export interface ErrorResponseProps {
-  error: RemixErrorResponse;
+  error: DevErrorBoudaryErrorResponse;
 }
 
 export const ErrorResponse: FunctionComponent<ErrorResponseProps> = ({
@@ -13,7 +14,7 @@ export const ErrorResponse: FunctionComponent<ErrorResponseProps> = ({
       <div className="mt-w-full">
         <div className="mt-text-red-500 mt-text-sm mt-p-4 mt-w-full">
           <code>
-            <pre>{error.data}</pre>
+            <pre>{error.message}</pre>
           </code>
         </div>
       </div>

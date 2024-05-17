@@ -78,16 +78,20 @@
     "node": ">=18.0.0"
   },
   "exports": {
+    ".": {
+      "import": "./dist/vite.js",
+      "types": "./dist/src/vite/vite.d.ts"
+    },
     "./react": {
       "import": "./dist/react.js",
       "types": "./dist/src/react/react.d.ts"
     },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/src/server/server.d.ts"
+    },
     "./styles": {
       "import": "./dist/styles.css"
-    },
-    ".": {
-      "import": "./dist/vite.js",
-      "types": "./dist/src/vite/vite.d.ts"
     }
   }
 }

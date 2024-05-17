@@ -204,7 +204,12 @@ const Frame: FunctionComponent<FrameProps> = ({
         onClick={() => onSelectFrame(frame)}
       >
         <div className="mt-text-sm mt-break-words">
-          {frame.file?.replace(searchValue, "")}
+          {frame.file?.replace(searchValue, "")}{" "}
+          {frame.file !== "<anonymous>" ? (
+            <span className="mt-font-mono mt-text-xs mt-text-opacity-80">
+              {frame.lineNumber}:{frame.column}
+            </span>
+          ) : null}
         </div>
       </button>
     </li>

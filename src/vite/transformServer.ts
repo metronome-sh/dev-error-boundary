@@ -13,19 +13,23 @@ export const transformServer = (code: string, id: string) => {
   const magicString = new MagicString(code, { filename: id });
 
   magicString.prepend(
-    'import { registerErrorBoundary } from "@metronome-sh/dev-error-boundary";\n'
+    'import { registerDevErrorBoundary } from "@metronome-sh/dev-error-boundary/server";\n'
   );
 
   walk(ast, (node) => {
     // Find the `const routes` and wrap it
     if (node.type === "VariableDeclaration" && node.declarations.length > 0) {
       node.declarations.forEach((declaration: any) => {
-        if (declaration.id && declaration.id.name === "routes" && declaration.init) {
+        if (
+          declaration.id &&
+          declaration.id.name === "routes" &&
+          declaration.init
+        ) {
           const [start, end] = declaration.init.range;
           magicString.overwrite(
             start,
             end,
-            `registerErrorBoundary(${code.substring(start, end)}, {})`
+            `registerDevErrorBoundary(${code.substring(start, end)}, {})`
           );
         }
       });

@@ -1,6 +1,7 @@
 import { PluginOption } from "vite";
 import { transformRoute } from "./transformRoute";
 import { transformServer } from "./transformServer";
+import { transformEntryServer } from "./transformEntryServer";
 
 let remixPluginContext: any;
 
@@ -28,7 +29,14 @@ export const devErrorBoundary: (config?: never) => PluginOption = () => {
       if (__remixPluginContext) remixPluginContext = __remixPluginContext;
     },
     transform(code, id) {
-      if ((isRouteFile(id) && isNotResourceRoute(code)) || id.match(/\/root\.[jt]sx$/)) {
+      if (id.match(/entry\.server\./)) {
+        return transformEntryServer({ code, id });
+      }
+
+      if (
+        (isRouteFile(id) && isNotResourceRoute(code)) ||
+        id.match(/\/root\.[jt]sx$/)
+      ) {
         const { appDirectory } = remixPluginContext.remixConfig;
         return transformRoute({ code, id, appDirectory });
       }

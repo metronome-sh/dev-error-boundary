@@ -1,17 +1,17 @@
-import { FunctionComponent } from "react";
-import { ErrorBoundary } from "./ErrorBoundary";
+import { DevErrorBoundary } from "./DevErrorBoundary";
 
 export function withErrorBoundary(
   appDirectory: string,
   IncomingErrorBoundary?: React.ComponentType<any>
 ) {
-  const OutgoingErrorBoundary: FunctionComponent = () => {
+  return () => {
     return (
-      <ErrorBoundary hasErrorBoundary={!!IncomingErrorBoundary} appDirectory={appDirectory}>
+      <DevErrorBoundary
+        hasErrorBoundary={!!IncomingErrorBoundary}
+        appDirectory={appDirectory}
+      >
         {IncomingErrorBoundary ? <IncomingErrorBoundary /> : null}
-      </ErrorBoundary>
+      </DevErrorBoundary>
     );
   };
-
-  return OutgoingErrorBoundary;
 }

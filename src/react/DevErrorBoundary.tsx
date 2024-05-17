@@ -5,30 +5,34 @@ import {
   useMemo,
   useState,
 } from "react";
-import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 import * as stackTraceParser from "stacktrace-parser";
 import { Source } from "./Source";
 import { Stack } from "./Stack";
 import { ExistingErrorBoundaryBanner } from "./ExistingErrorBoundaryBanner";
 import { ErrorHeader } from "./ErrorHeader";
 import { ErrorResponse } from "./ErrorResponse";
+import { useDevBoundaryError } from "./useDevBoundaryError";
+import { StackIcon } from "./icon/StackIcon";
+import { ContextIcon } from "./icon/ContextIcon";
 
-export interface ErrorBoundaryProps extends PropsWithChildren {
+export interface DevErrorBoundaryProps extends PropsWithChildren {
   hasErrorBoundary?: boolean;
   appDirectory: string;
 }
 
-export const ErrorBoundary: FunctionComponent<ErrorBoundaryProps> = ({
+export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
   children,
   hasErrorBoundary,
   appDirectory,
 }) => {
-  const error = useRouteError();
+  const error = useDevBoundaryError();
 
-  const isErrorResponse = isRouteErrorResponse(error);
+  console.log({ error });
 
   const stack = useMemo(() => {
-    return stackTraceParser.parse((error as Error).stack || "");
+    if (error.isErrorResponse) return [];
+
+    return stackTraceParser.parse(error.stack);
   }, [error]);
 
   const [showOriginalErrorBoundary, setShowOriginalErrorBoundary] =
@@ -63,8 +67,22 @@ export const ErrorBoundary: FunctionComponent<ErrorBoundaryProps> = ({
             setShowOriginalErrorBoundary={setShowOriginalErrorBoundary}
           />
         ) : null}
-        <ErrorHeader error={error as Error} />
-        {isErrorResponse ? (
+        <ErrorHeader error={error} />
+        <div className="mt-border-b mt-border-gray-200 mt-flex mt-gap-0 mt-text-sm mt-px-4 mt-pt-1">
+          <div className="mt-bg-gray-200 mt-py-1 mt-px-4 mt-rounded-t-md mt-flex mt-items-center mt-gap-2">
+            <span>
+              <StackIcon />
+            </span>
+            Stack
+          </div>
+          <div className="mt-bg-gray-50 mt-py-1 mt-px-4 mt-rounded-t-md mt-flex mt-items-center mt-gap-2">
+            <span>
+              <ContextIcon />
+            </span>
+            Context
+          </div>
+        </div>
+        {error.isErrorResponse ? (
           <ErrorResponse error={error} />
         ) : (
           <div className="mt-flex-grow mt-overflow-hidden mt-relative mt-pl-80">
@@ -74,7 +92,7 @@ export const ErrorBoundary: FunctionComponent<ErrorBoundaryProps> = ({
               onSelectFrame={(frame) => setSelectedFrame(frame)}
               selectedFrame={selectedFrame}
             />
-            <Source frame={selectedFrame} />
+            <Source appDirectory={appDirectory} frame={selectedFrame} />
           </div>
         )}
       </div>
