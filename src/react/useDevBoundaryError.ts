@@ -16,6 +16,10 @@ export interface DevErrorBoundaryErrorBase {
 export type DevErrorBoudaryErrorResponse = DevErrorBoundaryErrorBase & {
   stack: never;
   isErrorResponse: true;
+  response: {
+    status: number;
+    statusText: string;
+  };
 };
 
 export type DevErrorBoundaryRegularError = DevErrorBoundaryErrorBase & {
@@ -69,7 +73,7 @@ export function useDevBoundaryError(): DevErrorBoundaryError {
         params: {},
         stack: "",
         isErrorResponse: false,
-      } as DevErrorBoundaryError;
+      } as DevErrorBoundaryRegularError;
     }
   }, [error]);
 }

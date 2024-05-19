@@ -3,16 +3,17 @@ import * as stackTraceParser from "stacktrace-parser";
 import { cn } from "./cn";
 import { ExpandIcon } from "./icon/ExpandIcon";
 import { CollapseIcon } from "./icon/CollapseIcon";
+import { DevErrorBoundaryError } from "./useDevBoundaryError";
 
 export interface StackProps {
-  stack: stackTraceParser.StackFrame[];
+  error: DevErrorBoundaryError;
   appDirectory: string;
   onSelectFrame: (frame: stackTraceParser.StackFrame) => void;
   selectedFrame: stackTraceParser.StackFrame | null;
 }
 
 export const Stack: FunctionComponent<StackProps> = ({
-  stack,
+  error,
   appDirectory,
   onSelectFrame,
   selectedFrame,
@@ -20,6 +21,12 @@ export const Stack: FunctionComponent<StackProps> = ({
   const [expandedIdxs, setExpandedIdxs] = useState<number[]>([]);
 
   const searchValue = appDirectory.split("/").slice(0, -1).join("/");
+
+  const stack = useMemo(() => {
+    if (error.isErrorResponse) return [];
+
+    return stackTraceParser.parse(error.stack);
+  }, [error]);
 
   const groupedStack = useMemo(() => {
     return stack.reduce(
@@ -48,10 +55,12 @@ export const Stack: FunctionComponent<StackProps> = ({
     );
   }, [stack]);
 
+  if (error.isErrorResponse) return;
+
   return (
     <div className="mt-absolute mt-inset-y-0 mt-left-0 mt-w-80 mt-bg-gray-50 mt-border-r mt-border-gray-200 mt-overflow-y-scroll">
       <button
-        className="mt-text-sm mt-py-2 mt-border-b mt-px-4 mt-bg-white mt-w-full mt-flex mt-gap-2 mt-items-center hover:mt-bg-gray-100"
+        className="mt-text-sm mt-py-3 mt-border-b mt-px-4 mt-bg-white mt-w-full mt-flex mt-gap-2 mt-items-center hover:mt-bg-gray-100 mt-text-gray-500"
         onClick={expandAllNodeModules}
       >
         <span className="mt-text-gray-600">

@@ -29,6 +29,10 @@ export function withErrorBoundaryErrorHandler(
         __dev_error_boundary: {
           message: error.data,
           request: requestSnapshot,
+          response: {
+            status: error.status,
+            statusText: error.statusText,
+          },
           params,
           context,
         },

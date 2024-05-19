@@ -1,5 +1,3 @@
-import { isRouteErrorResponse } from "@remix-run/react";
-import { ErrorResponse } from "@remix-run/server-runtime";
 import { FunctionComponent } from "react";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
 
@@ -9,7 +7,7 @@ interface ErrorHeaderProps {
 
 export const ErrorHeader: FunctionComponent<ErrorHeaderProps> = ({ error }) => {
   return (
-    <div className="mt-p-5 mt-flex">
+    <div className="mt-px-5 mt-py-3 mt-mb-3 mt-flex mt-border-b mt-border-gray-100">
       <div className="mt-flex-grow">
         <div className="mt-text-sm mt-text-red-600">
           <span className="mt-mr-1">
@@ -29,8 +27,8 @@ export const ErrorHeader: FunctionComponent<ErrorHeaderProps> = ({ error }) => {
           Application Error
         </div>
         <div className="mt-text-lg mt-font-semibold">
-          {isRouteErrorResponse(error)
-            ? `${error.status} ${error.statusText}`
+          {error.isErrorResponse
+            ? `${error.response.status} ${error.response.statusText}`
             : error.message}
         </div>
       </div>

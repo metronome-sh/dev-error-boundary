@@ -73,10 +73,6 @@ export function transformEntryServer({
     );
   }
 
-  // console.log(magicString.toString());
-
-  // return { code, map: null };
-
   return {
     code: magicString.toString(),
     map: magicString.generateMap({ hires: true }),

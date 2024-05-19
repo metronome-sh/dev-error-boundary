@@ -10,10 +10,12 @@ import { Source } from "./Source";
 import { Stack } from "./Stack";
 import { ExistingErrorBoundaryBanner } from "./ExistingErrorBoundaryBanner";
 import { ErrorHeader } from "./ErrorHeader";
-import { ErrorResponse } from "./ErrorResponse";
 import { useDevBoundaryError } from "./useDevBoundaryError";
 import { StackIcon } from "./icon/StackIcon";
 import { ContextIcon } from "./icon/ContextIcon";
+import { Tabs } from "./Tabs";
+import { cn } from "./cn";
+import { Context } from "./Context";
 
 export interface DevErrorBoundaryProps extends PropsWithChildren {
   hasErrorBoundary?: boolean;
@@ -26,8 +28,6 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
   appDirectory,
 }) => {
   const error = useDevBoundaryError();
-
-  console.log({ error });
 
   const stack = useMemo(() => {
     if (error.isErrorResponse) return [];
@@ -54,7 +54,7 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
   }, [showOriginalErrorBoundary]);
 
   if (showOriginalErrorBoundary) {
-    return <>{children}</>;
+    return children;
   }
 
   if (!readyToRender) return null;
@@ -68,33 +68,37 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
           />
         ) : null}
         <ErrorHeader error={error} />
-        <div className="mt-border-b mt-border-gray-200 mt-flex mt-gap-0 mt-text-sm mt-px-4 mt-pt-1">
-          <div className="mt-bg-gray-200 mt-py-1 mt-px-4 mt-rounded-t-md mt-flex mt-items-center mt-gap-2">
-            <span>
-              <StackIcon />
-            </span>
-            Stack
-          </div>
-          <div className="mt-bg-gray-50 mt-py-1 mt-px-4 mt-rounded-t-md mt-flex mt-items-center mt-gap-2">
-            <span>
-              <ContextIcon />
-            </span>
-            Context
-          </div>
-        </div>
-        {error.isErrorResponse ? (
-          <ErrorResponse error={error} />
-        ) : (
-          <div className="mt-flex-grow mt-overflow-hidden mt-relative mt-pl-80">
+        <Tabs defaultValue="stack" className="mt-flex mt-flex-col mt-flex-grow">
+          <Tabs.List className="mt-flex-shrink-0">
+            <Tabs.Trigger icon={<StackIcon />} value="stack">
+              Stack
+            </Tabs.Trigger>
+            <Tabs.Trigger icon={<ContextIcon />} value="context">
+              Context
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content
+            value="stack"
+            className={cn("mt-relative mt-flex-grow mt-w-full", {
+              "mt-pl-80": !error.isErrorResponse,
+            })}
+          >
             <Stack
-              stack={stack}
+              error={error}
               appDirectory={appDirectory}
               onSelectFrame={(frame) => setSelectedFrame(frame)}
               selectedFrame={selectedFrame}
             />
-            <Source appDirectory={appDirectory} frame={selectedFrame} />
-          </div>
-        )}
+            <Source
+              error={error}
+              appDirectory={appDirectory}
+              frame={selectedFrame}
+            />
+          </Tabs.Content>
+          <Tabs.Content value="context" className="mt-flex-grow">
+            <Context error={error} />
+          </Tabs.Content>
+        </Tabs>
       </div>
     </div>
   );

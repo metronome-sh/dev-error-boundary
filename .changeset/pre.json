@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "prerelease",
+  "initialVersions": {
+    "@metronome-sh/dev-error-boundary": "0.0.1"
+  },
+  "changesets": [
+    "rotten-camels-roll",
+    "smart-carrots-fail",
+    "wet-readers-hunt"
+  ]
+}

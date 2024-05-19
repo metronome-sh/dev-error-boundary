@@ -1,21 +1,22 @@
 import { FunctionComponent, useEffect, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { ERROR_BOUNDARY_ROUTE_PATH } from "../common/constants";
+import { DevErrorBoundaryError } from "./useDevBoundaryError";
 
 export interface SourceProps {
+  error: DevErrorBoundaryError;
   frame: stackTraceParser.StackFrame | null;
   appDirectory: string;
 }
 
 export const Source: FunctionComponent<SourceProps> = ({
+  error,
   appDirectory,
   frame,
 }) => {
   const [source, setSource] = useState(null);
 
   useEffect(() => {
-    console.log({ frame });
-
     if (!frame || !frame.file || frame.file === "<anonymous>") return;
 
     setSource(null);
@@ -43,7 +44,21 @@ export const Source: FunctionComponent<SourceProps> = ({
     }
   }, [frame, source]);
 
-  if (!source)
+  if (error.isErrorResponse) {
+    return (
+      <div>
+        <div className="mt-w-full">
+          <div className="mt-text-red-500 mt-text-sm mt-p-4 mt-w-full">
+            <code>
+              <pre>{error.message}</pre>
+            </code>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!source) {
     return (
       <div className="mt-flex mt-justify-center mt-py-20 mt-text-gray-400 mt-w-full">
         <svg
@@ -62,6 +77,7 @@ export const Source: FunctionComponent<SourceProps> = ({
         </svg>
       </div>
     );
+  }
 
   const isAnonymous = frame?.file === "<anonymous>";
 
@@ -88,7 +104,7 @@ export const Source: FunctionComponent<SourceProps> = ({
               </span>
             </span>
           </div>
-          <div className="mt-h-full mt-overflow-scroll mt-">
+          <div className="mt-absolute mt-inset-0 mt-top-7 mt-overflow-scroll">
             <div
               className="mt-w-full *:mt-py-3 *:!mt-bg-transparent mt-bg-white *:mt-w-full [&>pre]:mt-w-full [&>pre]:mt-min-w-fit"
               data-error-code-container="true"
