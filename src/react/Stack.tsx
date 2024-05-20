@@ -55,12 +55,19 @@ export const Stack: FunctionComponent<StackProps> = ({
     );
   }, [stack]);
 
+  const shouldShowNodeModulesButton = useMemo(() => {
+    return stack.some((frame) => frame.file?.includes("node_modules/"));
+  }, [stack]);
+
   if (error.isErrorResponse) return;
 
   return (
     <div className="mt-absolute mt-inset-y-0 mt-left-0 mt-w-80 mt-bg-gray-50 mt-border-r mt-border-gray-200 mt-overflow-y-scroll">
       <button
-        className="mt-text-sm mt-py-3 mt-border-b mt-px-4 mt-bg-white mt-w-full mt-flex mt-gap-2 mt-items-center hover:mt-bg-gray-100 mt-text-gray-500"
+        className={cn(
+          "mt-text-sm mt-py-3 mt-border-b mt-px-4 mt-bg-white mt-w-full mt-flex mt-gap-2 mt-items-center hover:mt-bg-gray-100 mt-text-gray-500",
+          { hidden: !shouldShowNodeModulesButton }
+        )}
         onClick={expandAllNodeModules}
       >
         <span className="mt-text-gray-600">

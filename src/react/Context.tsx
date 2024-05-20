@@ -143,7 +143,7 @@ export const Context: FunctionComponent<ContextProps> = ({ error }) => {
             </div>
           </div>
         </div>
-        <div className="mt-px-8 mt-w-full">
+        <div className="mt-px-8 mt-border-t mt-py-4 mt-w-full">
           <h4 className="mt-font-medium mt-font-gray-800 mt-border-b mt-border-gray-100 mt-pb-2">
             Context
           </h4>
