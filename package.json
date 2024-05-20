@@ -1,6 +1,6 @@
 {
   "name": "@metronome-sh/dev-error-boundary",
-  "version": "0.0.2-prerelease.2",
+  "version": "0.0.2-prerelease.5",
   "description": "Remix dev error boundary",
   "type": "module",
   "files": [
@@ -30,11 +30,13 @@
   "homepage": "https://github.com/metronome-sh/metronome-sh#readme",
   "dependencies": {
     "@radix-ui/react-tabs": "^1.0.4",
+    "@tailwindcss/forms": "^0.5.7",
     "@typescript-eslint/typescript-estree": "^7.8.0",
     "clsx": "^2.1.1",
     "clx": "^1.0.0",
     "magic-string": "^0.30.5",
     "picocolors": "^1.0.0",
+    "serialize-javascript": "^6.0.2",
     "shiki": "^1.5.2",
     "source-map": "^0.7.4",
     "stacktrace-parser": "^0.1.10",
@@ -48,6 +50,7 @@
     "@types/node": ">=20.0.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
+    "@types/serialize-javascript": "^5.0.4",
     "autoprefixer": "^10.4.19",
     "concurrently": "^7.1.0",
     "esbuild": "^0.17.10",

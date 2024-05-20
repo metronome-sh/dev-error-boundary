@@ -7,15 +7,15 @@ interface ErrorHeaderProps {
 
 export const ErrorHeader: FunctionComponent<ErrorHeaderProps> = ({ error }) => {
   return (
-    <div className="mt-px-5 mt-py-3 mt-mb-3 mt-flex mt-border-b mt-border-gray-100">
-      <div className="mt-flex-grow">
-        <div className="mt-text-sm mt-text-red-600">
-          <span className="mt-mr-1">
+    <div className="px-5 py-3 mb-3 flex border-b border-gray-100">
+      <div className="flex-grow">
+        <div className="text-sm text-red-600">
+          <span className="mr-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 16 16"
               fill="currentColor"
-              className="mt-w-4 mt-h-4 mt-inline"
+              className="w-4 h-4 inline"
             >
               <path
                 fillRule="evenodd"
@@ -26,7 +26,7 @@ export const ErrorHeader: FunctionComponent<ErrorHeaderProps> = ({ error }) => {
           </span>
           Application Error
         </div>
-        <div className="mt-text-lg mt-font-semibold">
+        <div className="text-lg font-semibold">
           {error.isErrorResponse
             ? `${error.response.status} ${error.response.statusText}`
             : error.message}

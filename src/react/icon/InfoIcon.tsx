@@ -1,9 +1,7 @@
 import { FunctionComponent, SVGProps } from "react";
 import { cn } from "../cn";
 
-export const CollapseIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
-  props
-) => {
+export const InfoIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (props) => {
   const { className, ...rest } = props;
 
   return (
@@ -19,7 +17,7 @@ export const CollapseIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+        d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
       />
     </svg>
   );

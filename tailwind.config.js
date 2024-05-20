@@ -8,12 +8,12 @@ const spacing = Array.from(Array(1001).keys()).reduce(
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./src/**/*.tsx", "./src/**/*.ts"],
-  prefix: "mt-",
+  important: true,
   theme: {
     extend: {
       maxWidth: ({ theme }) => ({ ...theme("spacing"), "8xl": "90rem" }),
       spacing,
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };

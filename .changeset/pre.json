@@ -5,7 +5,10 @@
     "@metronome-sh/dev-error-boundary": "0.0.1"
   },
   "changesets": [
+    "lemon-rivers-shave",
+    "nasty-pumpkins-add",
     "rotten-camels-roll",
+    "shiny-pugs-agree",
     "smart-carrots-fail",
     "wet-readers-hunt"
   ]

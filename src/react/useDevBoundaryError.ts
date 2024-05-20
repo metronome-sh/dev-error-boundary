@@ -9,7 +9,7 @@ export interface DevErrorBoundaryErrorBase {
     headers: [string, string][];
     body: string;
   };
-  context: object;
+  context: string;
   params: Record<string, string>;
 }
 
@@ -69,7 +69,7 @@ export function useDevBoundaryError(): DevErrorBoundaryError {
       return {
         message: `[@metronome-sh/dev-error-boundary] An error occurred while parsing the error: ${error}`,
         request: { method: "", url: "", headers: [], body: "" },
-        context: {},
+        context: "",
         params: {},
         stack: "",
         isErrorResponse: false,

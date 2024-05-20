@@ -13,7 +13,7 @@ export const ExpandIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn("mt-w-4 mt-h-4", className)}
+      className={cn("w-4 h-4", className)}
       {...rest}
     >
       <path

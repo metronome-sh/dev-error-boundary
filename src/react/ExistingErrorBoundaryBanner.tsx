@@ -11,10 +11,10 @@ export const ExistingErrorBoundaryBanner: FunctionComponent<
   const error = useRouteError();
 
   return (
-    <div className="mt-text-xs mt-text-gray-600 mt-flex mt-gap-2 mt-border-b mt-p-2 mt-justify-center mt-items-center">
+    <div className="text-xs text-gray-600 flex gap-2 border-b p-2 justify-center items-center">
       <span>Existing error boundary detected.</span>
       <span
-        className="mt-cursor-pointer mt-text-blue-600"
+        className="cursor-pointer text-blue-600"
         onClick={() => {
           if (isRouteErrorResponse(error)) {
             const parsed = JSON.parse(error.data);
@@ -28,14 +28,14 @@ export const ExistingErrorBoundaryBanner: FunctionComponent<
         }}
       >
         Render current route error boundary{" "}
-        <span className="mt-ml-1 mt-inline">
+        <span className="ml-1 inline">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="mt-w-4 mt-h-4 mt-inline"
+            className="w-4 h-4 inline"
           >
             <path
               strokeLinecap="round"

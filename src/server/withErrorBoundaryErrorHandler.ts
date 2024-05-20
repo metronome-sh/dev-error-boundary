@@ -4,6 +4,66 @@ import {
   LoaderFunctionArgs,
 } from "@remix-run/server-runtime";
 
+const replacer = (key: string, value: any) => {
+  // Handle functions
+  if (typeof value === "function") {
+    return `[Function ${value.toString()}]`;
+  }
+
+  // Handle BigInts
+  if (typeof value === "bigint") {
+    return `[BigInt(${value.toString()})]`;
+  }
+
+  // Handle Maps
+  if (value instanceof Map) {
+    return {
+      dataType: "Map",
+      value: Array.from(value.entries()),
+    };
+  }
+
+  // Handle Sets
+  if (value instanceof Set) {
+    return {
+      dataType: "Set",
+      value: Array.from(value.values()),
+    };
+  }
+
+  // Handle Dates
+  if (value instanceof Date) {
+    return `[Date(${value.toISOString()})]`;
+  }
+
+  // Handle RegExps
+  if (value instanceof RegExp) {
+    return `[RegExp(${value.toString()})]`;
+  }
+
+  // Handle Errors
+  if (value instanceof Error) {
+    return {
+      dataType: "Error",
+      name: value.name,
+      message: value.message,
+      stack: value.stack,
+    };
+  }
+
+  // Handle generic objects
+  if (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    value.constructor.name !== "Object"
+  ) {
+    return `[${value.constructor.name}]`;
+  }
+
+  return value;
+};
+
 export function withErrorBoundaryErrorHandler(
   errorHandle?: (
     error: Error | ErrorResponse,
@@ -15,6 +75,14 @@ export function withErrorBoundaryErrorHandler(
     { request, params, context }: LoaderFunctionArgs | ActionFunctionArgs
   ) => {
     errorHandle?.(error, { request, params, context });
+
+    let serializedContext = "{}";
+
+    try {
+      serializedContext = JSON.stringify(context, replacer, 2);
+    } catch (error) {
+      serializedContext = JSON.stringify(context, null, 2);
+    }
 
     const requestSnapshot = {
       method: request.method,
@@ -34,7 +102,7 @@ export function withErrorBoundaryErrorHandler(
             statusText: error.statusText,
           },
           params,
-          context,
+          context: serializedContext,
         },
       });
     } else {
@@ -44,7 +112,7 @@ export function withErrorBoundaryErrorHandler(
           message: error.message,
           request: requestSnapshot,
           params,
-          context,
+          context: serializedContext,
         },
       });
     }

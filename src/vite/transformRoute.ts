@@ -34,49 +34,49 @@ export function transformRoute({
 
   // prettier-ignore
   const importStr = 'import { withErrorBoundary } from "@metronome-sh/dev-error-boundary/react";\n';
-
-  const stylesStr = 'import "@metronome-sh/dev-error-boundary/styles";';
+  const stylesStr = 'import "@metronome-sh/dev-error-boundary/styles";\n';
 
   const appDirectoryStr = JSON.stringify(appDirectory);
 
-  if (id.match(/\/root\.[jt]sx$/) && !code.includes(stylesStr)) {
-    magicString.prepend(stylesStr);
-  }
-
   if (!code.includes(importStr)) magicString.prepend(importStr);
+
+  const isRoot = id.match(/\/root\.[jt]sx$/);
+  if (isRoot && !code.includes(stylesStr)) magicString.prepend(stylesStr);
 
   let errorBoundaryFound = false;
 
   walk(ast, (node) => {
     if (isErrorBoundaryExport(node)) {
+      errorBoundaryFound = true;
+
       const [start, end] = node.declaration.range;
 
-      let declarationCode = code.substring(start, end);
-
-      // Modify the declaration based on its type
       if (node.declaration.type === "FunctionDeclaration") {
-        // Convert function declaration to constant declaration with function expression
-        declarationCode = `const ${
-          node.declaration.id.name
-        } = withErrorBoundary(${appDirectoryStr}, function ${
-          node.declaration.id.name
-        }() ${declarationCode.substring(declarationCode.indexOf("{"))});\n`;
-      } else if (
-        node.declaration.declarations[0].init.type === "ArrowFunctionExpression"
-      ) {
-        // Wrap arrow function with withErrorBoundary
-        declarationCode = `const ${
-          node.declaration.declarations[0].id.name
-        } = withErrorBoundary(${appDirectoryStr}, ${declarationCode
-          .substring(declarationCode.indexOf("=") + 1)
-          // Remove the last ";"
-          .replace(/;$/, "")
-          .trim()});`;
+        const declarationCode = code.substring(start, end).replace(/;$/g, "");
+
+        const replacementCode = `const ErrorBoundary = withErrorBoundary(${appDirectoryStr}, ${declarationCode})`;
+
+        magicString.overwrite(start, end, replacementCode);
+
+        return;
       }
 
-      magicString.overwrite(start, end, declarationCode);
+      if (node.declaration.type === "VariableDeclaration") {
+        const declarationCode = code
+          .substring(start, end)
+          .replace(/^.*ErrorBoundary\s*=\s*/g, "")
+          .replace(/;$/g, "");
 
-      errorBoundaryFound = true;
+        const replacementCode = `const ErrorBoundary = withErrorBoundary(${appDirectoryStr}, ${declarationCode})`;
+
+        magicString.overwrite(start, end, replacementCode);
+        return;
+      }
+
+      throw new Error(
+        "[dev-error-boundary] Unhandled ErrorBoundary export type:",
+        node.declaration.type
+      );
     }
   });
 

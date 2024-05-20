@@ -37,39 +37,48 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
 
   const [showOriginalErrorBoundary, setShowOriginalErrorBoundary] =
     useState(false);
-  const [readyToRender, setReadyToRender] = useState(false);
 
   const [selectedFrame, setSelectedFrame] =
     useState<stackTraceParser.StackFrame | null>(() => stack[0] || null);
 
+  const [render, setRender] = useState(false);
   useEffect(() => {
-    if (showOriginalErrorBoundary) return;
+    setRender(true);
+  }, []);
 
-    document.documentElement.classList.add("dev-error-boundary");
-    setReadyToRender(true);
+  const handleShowOriginalErrorBoundary = () => {
+    // Remove all dev-error-boundary styles
+    const styles = document.querySelectorAll("style");
 
-    return () => {
-      document.documentElement.classList.remove("dev-error-boundary");
-    };
-  }, [showOriginalErrorBoundary]);
+    styles.forEach((style) => {
+      if (
+        style.innerHTML.includes("dev-error-boundary") ||
+        style.getAttribute("data-vite-dev-id")?.includes("dev-error-boundary")
+      ) {
+        style.remove();
+      }
+    });
+
+    setShowOriginalErrorBoundary(true);
+  };
+
+  if (!render) return null;
 
   if (showOriginalErrorBoundary) {
     return children;
   }
 
-  if (!readyToRender) return null;
-
   return (
-    <div className="mt-bg-zinc-50 mt-h-screen mt-py-6">
-      <div className="mt-bg-white mt-flex mt-flex-col mt-max-w-screen-xl mt-mx-auto mt-border mt-shadow-md mt-h-full mt-rounded-lg mt-overflow-hidden">
+    <div className="bg-zinc-50 h-screen py-6">
+      <div className="bg-white flex flex-col max-w-screen-xl mx-auto border shadow-md h-full rounded-lg overflow-hidden">
         {hasErrorBoundary ? (
           <ExistingErrorBoundaryBanner
-            setShowOriginalErrorBoundary={setShowOriginalErrorBoundary}
+            setShowOriginalErrorBoundary={handleShowOriginalErrorBoundary}
           />
         ) : null}
         <ErrorHeader error={error} />
-        <Tabs defaultValue="stack" className="mt-flex mt-flex-col mt-flex-grow">
-          <Tabs.List className="mt-flex-shrink-0">
+        <Tabs defaultValue="stack" className="flex flex-col flex-grow">
+          <Tabs.List className="flex-shrink-0">
             <Tabs.Trigger icon={<StackIcon />} value="stack">
               Stack
             </Tabs.Trigger>
@@ -79,8 +88,8 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
           </Tabs.List>
           <Tabs.Content
             value="stack"
-            className={cn("mt-relative mt-flex-grow mt-w-full", {
-              "mt-pl-80": !error.isErrorResponse,
+            className={cn("relative flex-grow w-full", {
+              "pl-80": !error.isErrorResponse,
             })}
           >
             <Stack
@@ -95,7 +104,7 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
               frame={selectedFrame}
             />
           </Tabs.Content>
-          <Tabs.Content value="context" className="mt-flex-grow">
+          <Tabs.Content value="context" className="flex-grow">
             <Context error={error} />
           </Tabs.Content>
         </Tabs>
