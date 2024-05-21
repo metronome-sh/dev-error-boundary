@@ -1,10 +1,4 @@
-import {
-  FunctionComponent,
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FunctionComponent, useEffect, useMemo, useRef, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { Source } from "./Source";
 import { Stack } from "./Stack";
@@ -17,14 +11,13 @@ import { Tabs } from "./Tabs";
 import { cn } from "./cn";
 import { Context } from "./Context";
 
-export interface DevErrorBoundaryProps extends PropsWithChildren {
-  hasErrorBoundary?: boolean;
+export interface DevErrorBoundaryProps {
+  onRenderOriginalErrorBoundary?: () => void;
   appDirectory: string;
 }
 
 export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
-  children,
-  hasErrorBoundary,
+  onRenderOriginalErrorBoundary,
   appDirectory,
 }) => {
   const error = useDevBoundaryError();
@@ -35,45 +28,59 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
     return stackTraceParser.parse(error.stack);
   }, [error]);
 
-  const [showOriginalErrorBoundary, setShowOriginalErrorBoundary] =
-    useState(false);
-
   const [selectedFrame, setSelectedFrame] =
     useState<stackTraceParser.StackFrame | null>(() => stack[0] || null);
 
-  const [render, setRender] = useState(false);
+  const appStyleRefs = useRef<
+    { style: HTMLLinkElement; parent: HTMLElement | null }[]
+  >([]);
+
   useEffect(() => {
-    setRender(true);
-  }, []);
+    const styles = document.querySelectorAll(
+      "link[rel=stylesheet]"
+    ) as NodeListOf<HTMLLinkElement>;
 
-  const handleShowOriginalErrorBoundary = () => {
-    // Remove all dev-error-boundary styles
-    const styles = document.querySelectorAll("style");
-
+    // Add all styles to the refs
     styles.forEach((style) => {
-      if (
-        style.innerHTML.includes("dev-error-boundary") ||
-        style.getAttribute("data-vite-dev-id")?.includes("dev-error-boundary")
-      ) {
-        style.remove();
+      if (!appStyleRefs.current.find((ref) => ref.style === style)) {
+        appStyleRefs.current.push({ style, parent: style.parentElement });
       }
     });
 
-    setShowOriginalErrorBoundary(true);
-  };
+    // Remove all styles except the ones that are related to the dev-error-boundary
+    // to prevent collisions with the dev-error-boundary styles
+    appStyleRefs.current.forEach(({ style, parent }) => {
+      if (!style.getAttribute("href")?.includes("dev-error-boundary")) {
+        style.remove();
+      } else {
+        if (parent) parent.appendChild(style);
+        else document.head.appendChild(style);
+      }
+    });
 
-  if (!render) return null;
-
-  if (showOriginalErrorBoundary) {
-    return children;
-  }
+    return () => {
+      // Remove all styles that are related to the dev-error-boundary
+      // and add back the original styles
+      appStyleRefs.current.forEach(({ style, parent }) => {
+        if (style.getAttribute("href")?.includes("dev-error-boundary")) {
+          style.remove();
+        } else {
+          if (parent) parent.appendChild(style);
+          else document.head.appendChild(style);
+        }
+      });
+    };
+  }, []);
 
   return (
-    <div className="bg-zinc-50 h-screen py-6">
-      <div className="bg-white flex flex-col max-w-screen-xl mx-auto border shadow-md h-full rounded-lg overflow-hidden">
-        {hasErrorBoundary ? (
+    <div
+      className="bg-zinc-50 h-screen dev-error-boundary"
+      style={{ display: "none" }}
+    >
+      <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
+        {onRenderOriginalErrorBoundary ? (
           <ExistingErrorBoundaryBanner
-            setShowOriginalErrorBoundary={handleShowOriginalErrorBoundary}
+            setShowOriginalErrorBoundary={onRenderOriginalErrorBoundary}
           />
         ) : null}
         <ErrorHeader error={error} />

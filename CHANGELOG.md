@@ -1,5 +1,23 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.2-prerelease.8
+
+### Patch Changes
+
+- now the error is full screen
+
+## 0.0.2-prerelease.7
+
+### Patch Changes
+
+- fixed fouc
+
+## 0.0.2-prerelease.6
+
+### Patch Changes
+
+- fixed css scoping problems
+
 ## 0.0.2-prerelease.5
 
 ### Patch Changes

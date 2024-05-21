@@ -1,5 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 import { FunctionComponent } from "react";
+import { ArrowLeftIcon } from "./icon/ArrowLeftIcon";
 
 interface ExistingErrorBoundaryBannerProps {
   setShowOriginalErrorBoundary: (show: boolean) => void;
@@ -29,20 +30,7 @@ export const ExistingErrorBoundaryBanner: FunctionComponent<
       >
         Render current route error boundary{" "}
         <span className="ml-1 inline">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-4 h-4 inline"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
-            />
-          </svg>
+          <ArrowLeftIcon />
         </span>
       </span>
     </div>

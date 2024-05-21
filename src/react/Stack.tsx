@@ -1,4 +1,10 @@
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { cn } from "./cn";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
@@ -54,10 +60,15 @@ export const Stack: FunctionComponent<StackProps> = ({
   }, [stack]);
 
   // Get from the localstorage the last state of the showFullStack
-  const [showHiddenFrames, setShowHiddenFrames] = useState(() => {
-    const stored = localStorage.getItem("dev-error-boundary:show-full-stack");
-    return stored === "true";
-  });
+  const [showHiddenFrames, setShowHiddenFrames] = useState(false);
+
+  useEffect(() => {
+    // Check localstorage for the last state of the showFullStack
+    const showFullStack = localStorage.getItem(
+      "dev-error-boundary:show-full-stack"
+    );
+    setShowHiddenFrames(showFullStack === "true");
+  }, []);
 
   const canShowFullStack = stack.some(
     (frame) =>

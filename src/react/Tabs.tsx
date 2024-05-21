@@ -79,7 +79,7 @@ const TabsTrigger = forwardRef<
     className={cn(
       [
         "group border border-transparent relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-t-md pl-3 pr-4 pt-2 pb-1 text-sm text-gray-500 bg-gray-50 hover:text-gray-600 hover:bg-gray-100",
-        "ring-offset-bg-white transition-all focus-visible:!outline-none focus-visible:ring-2 focus-visible:ring-gray-200",
+        "ring-offset-bg-white focus-visible:!outline-none focus-visible:ring-2 focus-visible:ring-gray-200",
         "focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
         "data-[state=active]:text-gray-800 data-[state=active]:border-gray-200 data-[state=active]:bg-white data-[state=active]:text-foreground",
       ],
@@ -87,7 +87,7 @@ const TabsTrigger = forwardRef<
     )}
     {...props}
   >
-    <div className="absolute border-b-2 inset-x-0 bottom-[-1px] border-gray-50 group-hover:border-gray-100 group-data-[state=active]:border-white group-data-[state=active]:bottom-[-2px] transition-all" />
+    <div className="absolute border-b-2 inset-x-0 bottom-[-1px] border-gray-50 group-hover:border-gray-100 group-data-[state=active]:border-white group-data-[state=active]:bottom-[-2px]" />
     <span>{icon}</span>
     <span>{children}</span>
   </TabsPrimitive.Trigger>

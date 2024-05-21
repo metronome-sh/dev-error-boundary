@@ -2,13 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* [data-error-code-container] code .error {
-  margin: 0 -24px;
-  padding: 0 24px;
-  min-width: calc(100% + 24px);
-  display: inline-block;
-  @apply bg-red-100;
-} */
+.dev-error-boundary {
+  display: block !important;
+}
 
 [data-error-code-container] code .line {
   position: relative;
@@ -37,13 +33,4 @@
   display: inline-block;
   text-align: right;
   @apply text-gray-400;
-  /* color: rgba(115, 138, 148, 0.4); */
 }
-
-/* [data-line-upper-boundary] {
-  border-top: 1px solid rgba(39, 39, 42, 1);
-  margin: 0.5rem -24px 0 -24px;
-  padding: 0.5rem 24px 0 24px;
-  min-width: calc(100% + 24px);
-  display: inline-block;
-} */
