@@ -4,8 +4,10 @@ import { Svg } from "./Svg";
 export const ArrowDownIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
   props
 ) => {
+  const { className, ...rest } = props;
+
   return (
-    <Svg {...props}>
+    <Svg {...rest}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

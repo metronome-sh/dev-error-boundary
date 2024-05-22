@@ -11,6 +11,7 @@ export interface DevErrorBoundaryErrorBase {
   };
   context: string;
   params: Record<string, string>;
+  reactBound: boolean;
 }
 
 export type DevErrorBoudaryErrorResponse = DevErrorBoundaryErrorBase & {
@@ -65,14 +66,17 @@ export function useDevBoundaryError(): DevErrorBoundaryError {
       }
 
       throw new Error("Error is not an instance of Error or ErrorResponse.");
-    } catch (error) {
+    } catch (e) {
+      // console.log({ error });
+
       return {
-        message: `[@metronome-sh/dev-error-boundary] An error occurred while parsing the error: ${error}`,
+        message: (error as Error).message,
         request: { method: "", url: "", headers: [], body: "" },
         context: "",
         params: {},
-        stack: "",
+        stack: (error as Error).stack || "",
         isErrorResponse: false,
+        reactBound: true,
       } as DevErrorBoundaryRegularError;
     }
   }, [error]);

@@ -6,9 +6,11 @@
   },
   "changesets": [
     "clean-flies-unite",
+    "empty-walls-deliver",
     "hungry-ants-wait",
     "lemon-rivers-shave",
     "nasty-pumpkins-add",
+    "nice-ducks-study",
     "rotten-camels-roll",
     "shiny-pugs-agree",
     "smart-carrots-fail",

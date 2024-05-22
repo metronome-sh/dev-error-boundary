@@ -2,6 +2,8 @@ import { FunctionComponent, useEffect, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { ERROR_BOUNDARY_ROUTE_PATH } from "../common/constants";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
+import { cn } from "./cn";
+import { InfoIcon } from "./icon/InfoIcon";
 
 export interface SourceProps {
   error: DevErrorBoundaryError;
@@ -16,8 +18,11 @@ export const Source: FunctionComponent<SourceProps> = ({
 }) => {
   const [source, setSource] = useState(null);
 
+  const cannotRenderSource =
+    frame?.file === "<anonymous>" || frame?.file?.includes("node:");
+
   useEffect(() => {
-    if (!frame || !frame.file || frame.file === "<anonymous>") return;
+    if (!frame || !frame.file || cannotRenderSource) return;
 
     setSource(null);
 
@@ -42,7 +47,7 @@ export const Source: FunctionComponent<SourceProps> = ({
     if (errorLine) {
       errorLine.scrollIntoView({ block: "center" });
     }
-  }, [frame, source]);
+  }, [frame, source, cannotRenderSource]);
 
   if (error.isErrorResponse) {
     return (
@@ -79,11 +84,17 @@ export const Source: FunctionComponent<SourceProps> = ({
     );
   }
 
-  const cannotRenderSource =
-    frame?.file === "<anonymous>" || frame?.file?.includes("node:");
-
   return (
     <div className="text-sm h-full w-full flex-1">
+      {error.reactBound || true ? (
+        <div className="h-7 border-b bg-amber-100 flex items-center px-4 gap-1">
+          <InfoIcon strokeWidth={2} className="text-amber-600" />
+          <span className="font-medium text-amber-900">
+            There is a known issue with the line numbers of the stack trace when
+            the error occurs in a React component. We are working on a fix.
+          </span>
+        </div>
+      ) : null}
       {cannotRenderSource ? (
         <div className="p-3">
           <pre className="font-mono">
@@ -92,7 +103,11 @@ export const Source: FunctionComponent<SourceProps> = ({
         </div>
       ) : (
         <div className="h-full relative">
-          <div className="absolute top-0 inset-x-0 bg-white border-b z-10 h-7 flex items-center justify-end px-4 w-full">
+          <div
+            className={cn(
+              "absolute top-0 inset-x-0 bg-white border-b z-10 h-7 flex items-center justify-end px-4 w-full"
+            )}
+          >
             <span
               className="text-gray-400 font-mono truncate rtl"
               style={{ direction: "rtl" }}

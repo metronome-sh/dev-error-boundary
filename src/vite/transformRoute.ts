@@ -21,6 +21,11 @@ export function transformRoute({
 
   const magicString = new MagicString(code, { filename: id });
 
+  // TODO REMOVE the stylesheet import on load for the root file
+  // We don't want to cause conflicts with the styles of the app
+
+  const isRoot = id.match(/\/root\.[jt]sx$/);
+
   // prettier-ignore
   const importStr = 'import { withErrorBoundary, withErrorBoundaryLinks } from "@metronome-sh/dev-error-boundary/react";\n';
   // prettier-ignore
@@ -29,13 +34,13 @@ export function transformRoute({
   const appDirectoryStr = JSON.stringify(appDirectory);
 
   if (!code.includes(importStr)) magicString.prepend(importStr);
-  if (!code.includes(stylesStr)) magicString.prepend(stylesStr);
+  if (!code.includes(stylesStr) && isRoot) magicString.prepend(stylesStr);
 
   let errorBoundaryFound = false;
   let linksExportFound = false;
 
   walk(ast, (node) => {
-    if (isNamedExport(node, "links")) {
+    if (isNamedExport(node, "links") && isRoot) {
       linksExportFound = true;
 
       const [start, end] = node.declaration.range;
@@ -106,7 +111,7 @@ export function transformRoute({
   if (!errorBoundaryFound) magicString.append(`\nexport const ErrorBoundary = withErrorBoundary(${appDirectoryStr});\n`)
 
   // prettier-ignore
-  if (!linksExportFound) magicString.append(`\nexport const links = () => [{ rel: "stylesheet", href: devErrorBoundaryStyles }];\n`);
+  if (!linksExportFound && isRoot) magicString.append(`\nexport const links = () => [{ rel: "stylesheet", href: devErrorBoundaryStyles }];\n`);
 
   return {
     code: magicString.toString(),

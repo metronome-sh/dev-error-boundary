@@ -1,6 +1,6 @@
 {
   "name": "@metronome-sh/dev-error-boundary",
-  "version": "0.0.2-prerelease.8",
+  "version": "0.0.2-prerelease.10",
   "description": "Remix dev error boundary",
   "type": "module",
   "files": [
@@ -46,6 +46,7 @@
     "@changesets/cli": "^2.27.2",
     "@cloudflare/workers-types": "^4.20240405.0",
     "@remix-run/cloudflare-pages": "^2.8.1",
+    "@remix-run/server-runtime": "^2.9.2",
     "@testing-library/react": "^14.1.2",
     "@types/node": ">=20.0.0",
     "@types/react": "^18.2.20",

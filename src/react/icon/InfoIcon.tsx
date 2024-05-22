@@ -2,10 +2,8 @@ import { FunctionComponent, SVGProps } from "react";
 import { Svg } from "./Svg";
 
 export const InfoIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (props) => {
-  const { className, ...rest } = props;
-
   return (
-    <Svg {...rest}>
+    <Svg {...props}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

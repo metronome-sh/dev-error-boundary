@@ -1,5 +1,17 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.2-prerelease.10
+
+### Patch Changes
+
+- scoped tailwindcss
+
+## 0.0.2-prerelease.9
+
+### Patch Changes
+
+- found a better way to apply styles
+
 ## 0.0.2-prerelease.8
 
 ### Patch Changes

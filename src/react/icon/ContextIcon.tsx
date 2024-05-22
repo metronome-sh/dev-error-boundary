@@ -4,10 +4,8 @@ import { Svg } from "./Svg";
 export const ContextIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
   props
 ) => {
-  const { className, ...rest } = props;
-
   return (
-    <Svg {...rest}>
+    <Svg {...props}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

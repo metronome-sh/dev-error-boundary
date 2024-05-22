@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useMemo, useRef, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { Source } from "./Source";
 import { Stack } from "./Stack";
@@ -31,90 +31,68 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
   const [selectedFrame, setSelectedFrame] =
     useState<stackTraceParser.StackFrame | null>(() => stack[0] || null);
 
-  const appStyleRefs = useRef<
-    { style: HTMLLinkElement; parent: HTMLElement | null }[]
-  >([]);
+  // useEffect(() => {
+  //   const styles = document.querySelectorAll(
+  //     "link[rel=stylesheet]"
+  //   ) as NodeListOf<HTMLLinkElement>;
 
-  useEffect(() => {
-    const styles = document.querySelectorAll(
-      "link[rel=stylesheet]"
-    ) as NodeListOf<HTMLLinkElement>;
+  //   // Disable all styles except the dev-error-boundary styles
+  //   styles.forEach((style) => {
+  //     if (style.id === "dev-error-boundary-styles") style.disabled = false;
+  //     else style.disabled = true;
+  //   });
 
-    // Add all styles to the refs
-    styles.forEach((style) => {
-      if (!appStyleRefs.current.find((ref) => ref.style === style)) {
-        appStyleRefs.current.push({ style, parent: style.parentElement });
-      }
-    });
-
-    // Remove all styles except the ones that are related to the dev-error-boundary
-    // to prevent collisions with the dev-error-boundary styles
-    appStyleRefs.current.forEach(({ style, parent }) => {
-      if (!style.getAttribute("href")?.includes("dev-error-boundary")) {
-        style.remove();
-      } else {
-        if (parent) parent.appendChild(style);
-        else document.head.appendChild(style);
-      }
-    });
-
-    return () => {
-      // Remove all styles that are related to the dev-error-boundary
-      // and add back the original styles
-      appStyleRefs.current.forEach(({ style, parent }) => {
-        if (style.getAttribute("href")?.includes("dev-error-boundary")) {
-          style.remove();
-        } else {
-          if (parent) parent.appendChild(style);
-          else document.head.appendChild(style);
-        }
-      });
-    };
-  }, []);
+  //   return () => {
+  //     // Re-enable all styles and disable the dev-error-boundary styles
+  //     styles.forEach((style) => {
+  //       if (style.id === "dev-error-boundary-styles") style.disabled = true;
+  //       else style.disabled = false;
+  //     });
+  //   };
+  // }, []);
 
   return (
-    <div
-      className="bg-zinc-50 h-screen dev-error-boundary"
-      style={{ display: "none" }}
-    >
-      <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
-        {onRenderOriginalErrorBoundary ? (
-          <ExistingErrorBoundaryBanner
-            setShowOriginalErrorBoundary={onRenderOriginalErrorBoundary}
-          />
-        ) : null}
-        <ErrorHeader error={error} />
-        <Tabs defaultValue="stack" className="flex flex-col flex-grow">
-          <Tabs.List className="flex-shrink-0">
-            <Tabs.Trigger icon={<StackIcon />} value="stack">
-              Stack
-            </Tabs.Trigger>
-            <Tabs.Trigger icon={<ContextIcon />} value="context">
-              Context
-            </Tabs.Trigger>
-          </Tabs.List>
-          <Tabs.Content
-            value="stack"
-            className={cn("relative flex-grow w-full", {
-              "pl-80": !error.isErrorResponse,
-            })}
-          >
-            <Stack
-              error={error}
-              appDirectory={appDirectory}
-              onSelectFrame={(frame) => setSelectedFrame(frame)}
-              selectedFrame={selectedFrame}
+    <div className="dev-error-boundary" style={{ display: "none" }}>
+      <div className="bg-zinc-50 h-screen !absolute top-0 bottom-0 left-0 right-0">
+        <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
+          {onRenderOriginalErrorBoundary ? (
+            <ExistingErrorBoundaryBanner
+              setShowOriginalErrorBoundary={onRenderOriginalErrorBoundary}
             />
-            <Source
-              error={error}
-              appDirectory={appDirectory}
-              frame={selectedFrame}
-            />
-          </Tabs.Content>
-          <Tabs.Content value="context" className="flex-grow">
-            <Context error={error} />
-          </Tabs.Content>
-        </Tabs>
+          ) : null}
+          <ErrorHeader error={error} />
+          <Tabs defaultValue="stack" className="flex flex-col flex-grow">
+            <Tabs.List className="flex-shrink-0">
+              <Tabs.Trigger icon={<StackIcon />} value="stack">
+                Stack
+              </Tabs.Trigger>
+              <Tabs.Trigger icon={<ContextIcon />} value="context">
+                Context
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content
+              value="stack"
+              className={cn("relative flex-grow w-full", {
+                "pl-80": !error.isErrorResponse,
+              })}
+            >
+              <Stack
+                error={error}
+                appDirectory={appDirectory}
+                onSelectFrame={(frame) => setSelectedFrame(frame)}
+                selectedFrame={selectedFrame}
+              />
+              <Source
+                error={error}
+                appDirectory={appDirectory}
+                frame={selectedFrame}
+              />
+            </Tabs.Content>
+            <Tabs.Content value="context" className="flex-grow">
+              <Context error={error} />
+            </Tabs.Content>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
