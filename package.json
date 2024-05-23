@@ -1,6 +1,6 @@
 {
   "name": "@metronome-sh/dev-error-boundary",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Remix dev error boundary",
   "type": "module",
   "files": [

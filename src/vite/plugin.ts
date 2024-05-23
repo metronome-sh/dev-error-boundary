@@ -3,9 +3,9 @@ import { transformRoute } from "./transformRoute";
 import { transformServer } from "./transformServer";
 import { transformEntryServer } from "./transformEntryServer";
 
-let remixPluginContext: any;
-
+let remixPluginContext: any = { remixConfig: { appDirectory: "" } };
 let routes: string[] = [];
+let mode: string = "development";
 
 export const devErrorBoundary: (config?: never) => PluginOption = () => {
   function isRouteFile(id: string) {
@@ -22,10 +22,13 @@ export const devErrorBoundary: (config?: never) => PluginOption = () => {
     apply: "serve",
     enforce: "pre",
     configResolved(resolvedConfig) {
+      mode = resolvedConfig.mode;
       const { __remixPluginContext } = resolvedConfig as any;
       if (__remixPluginContext) remixPluginContext = __remixPluginContext;
     },
     transform(code, id) {
+      if (mode !== "development") return;
+
       if (id.match(/virtual:remix\/server-build/)) {
         return transformServer({
           code,

@@ -31,29 +31,9 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
   const [selectedFrame, setSelectedFrame] =
     useState<stackTraceParser.StackFrame | null>(() => stack[0] || null);
 
-  // useEffect(() => {
-  //   const styles = document.querySelectorAll(
-  //     "link[rel=stylesheet]"
-  //   ) as NodeListOf<HTMLLinkElement>;
-
-  //   // Disable all styles except the dev-error-boundary styles
-  //   styles.forEach((style) => {
-  //     if (style.id === "dev-error-boundary-styles") style.disabled = false;
-  //     else style.disabled = true;
-  //   });
-
-  //   return () => {
-  //     // Re-enable all styles and disable the dev-error-boundary styles
-  //     styles.forEach((style) => {
-  //       if (style.id === "dev-error-boundary-styles") style.disabled = true;
-  //       else style.disabled = false;
-  //     });
-  //   };
-  // }, []);
-
   return (
     <div className="dev-error-boundary" style={{ display: "none" }}>
-      <div className="bg-zinc-50 !absolute inset-0">
+      <div className="bg-zinc-50 !absolute inset-0 z-[2147483647]">
         <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
           {onRenderOriginalErrorBoundary ? (
             <ExistingErrorBoundaryBanner

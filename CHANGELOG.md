@@ -1,5 +1,17 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.5
+
+### Patch Changes
+
+- fixed build step in production mode
+
+## 0.0.4
+
+### Patch Changes
+
+- Now the error boundary renders at the top always
+
 ## 0.0.3
 
 ### Patch Changes
