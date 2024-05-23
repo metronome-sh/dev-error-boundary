@@ -86,7 +86,7 @@ export const Source: FunctionComponent<SourceProps> = ({
 
   return (
     <div className="text-sm h-full w-full flex-1 flex flex-col">
-      {error.reactBound || true ? (
+      {error.reactBound ? (
         <div className="py-2 border-b bg-amber-100 flex items-start px-4 gap-1 flex-shrink-0">
           <InfoIcon strokeWidth={2} className="text-amber-600 mt-0.5" />
           <span className="font-medium text-amber-900">

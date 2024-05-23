@@ -1,5 +1,11 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.3
+
+### Patch Changes
+
+- fixed React bug message
+
 ## 0.0.2
 
 ### Patch Changes
