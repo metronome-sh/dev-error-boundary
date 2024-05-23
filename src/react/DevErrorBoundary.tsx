@@ -53,7 +53,7 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
 
   return (
     <div className="dev-error-boundary" style={{ display: "none" }}>
-      <div className="bg-zinc-50 h-screen !absolute top-0 bottom-0 left-0 right-0">
+      <div className="bg-zinc-50 !absolute inset-0">
         <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
           {onRenderOriginalErrorBoundary ? (
             <ExistingErrorBoundaryBanner

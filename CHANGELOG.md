@@ -1,5 +1,35 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.2
+
+### Patch Changes
+
+- aac4249: fixed fouc
+- 897699f: found a better way to apply styles
+- Fixed css + React error boundary
+- aac4249: now the error is full screen
+- 60f2947: Fixes
+- 60f2947: removed console.logs
+- 897699f: scoped tailwindcss
+- more css fixes
+- 97493d4: fixed more typings
+- 60f2947: fixed styles import
+- 97493d4: prerelease
+- aac4249: fixed css scoping problems
+- 97493d4: fixed types
+
+## 0.0.2-prerelease.12
+
+### Patch Changes
+
+- more css fixes
+
+## 0.0.2-prerelease.11
+
+### Patch Changes
+
+- Fixed css + React error boundary
+
 ## 0.0.2-prerelease.10
 
 ### Patch Changes

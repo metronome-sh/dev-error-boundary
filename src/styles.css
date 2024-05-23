@@ -455,3 +455,7 @@ video {
   text-align: right;
   @apply text-gray-400;
 }
+
+.shiki {
+  tab-size: 5;
+}

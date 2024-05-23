@@ -85,10 +85,10 @@ export const Source: FunctionComponent<SourceProps> = ({
   }
 
   return (
-    <div className="text-sm h-full w-full flex-1">
+    <div className="text-sm h-full w-full flex-1 flex flex-col">
       {error.reactBound || true ? (
-        <div className="h-7 border-b bg-amber-100 flex items-center px-4 gap-1">
-          <InfoIcon strokeWidth={2} className="text-amber-600" />
+        <div className="py-2 border-b bg-amber-100 flex items-start px-4 gap-1 flex-shrink-0">
+          <InfoIcon strokeWidth={2} className="text-amber-600 mt-0.5" />
           <span className="font-medium text-amber-900">
             There is a known issue with the line numbers of the stack trace when
             the error occurs in a React component. We are working on a fix.
@@ -102,7 +102,7 @@ export const Source: FunctionComponent<SourceProps> = ({
           </pre>
         </div>
       ) : (
-        <div className="h-full relative">
+        <div className="relative flex-grow">
           <div
             className={cn(
               "absolute top-0 inset-x-0 bg-white border-b z-10 h-7 flex items-center justify-end px-4 w-full"
