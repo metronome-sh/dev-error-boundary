@@ -1,18 +1,7 @@
 import MagicString from "magic-string";
 import { parse } from "@typescript-eslint/typescript-estree";
 import { walk } from "./walk";
-
-const isErrorBoundaryExport = (node: any) => {
-  return (
-    node.type === "ExportNamedDeclaration" &&
-    node.declaration &&
-    ((node.declaration.type === "FunctionDeclaration" &&
-      node.declaration.id.name === "ErrorBoundary") ||
-      (node.declaration.type === "VariableDeclaration" &&
-        node.declaration.declarations.length === 1 &&
-        node.declaration.declarations[0].id.name === "ErrorBoundary"))
-  );
-};
+import { isNamedExport } from "./isNamedExport";
 
 export function transformRoute({
   code,
@@ -32,59 +21,97 @@ export function transformRoute({
 
   const magicString = new MagicString(code, { filename: id });
 
-  // prettier-ignore
-  const importStr = 'import { withErrorBoundary } from "@metronome-sh/dev-error-boundary/react";\n';
+  // TODO REMOVE the stylesheet import on load for the root file
+  // We don't want to cause conflicts with the styles of the app
 
-  const stylesStr = 'import "@metronome-sh/dev-error-boundary/styles";';
+  const isRoot = id.match(/\/root\.[jt]sx$/);
+
+  // prettier-ignore
+  const importStr = 'import { withErrorBoundary, withErrorBoundaryLinks } from "@metronome-sh/dev-error-boundary/react";\n';
+  // prettier-ignore
+  const stylesStr = 'import devErrorBoundaryStyles from "@metronome-sh/dev-error-boundary/styles?url";\n';
 
   const appDirectoryStr = JSON.stringify(appDirectory);
 
-  if (id.match(/\/root\.[jt]sx$/) && !code.includes(stylesStr)) {
-    magicString.prepend(stylesStr);
-  }
-
   if (!code.includes(importStr)) magicString.prepend(importStr);
+  if (!code.includes(stylesStr) && isRoot) magicString.prepend(stylesStr);
 
   let errorBoundaryFound = false;
+  let linksExportFound = false;
 
   walk(ast, (node) => {
-    if (isErrorBoundaryExport(node)) {
+    if (isNamedExport(node, "links") && isRoot) {
+      linksExportFound = true;
+
       const [start, end] = node.declaration.range;
 
-      let declarationCode = code.substring(start, end);
-
-      // Modify the declaration based on its type
       if (node.declaration.type === "FunctionDeclaration") {
-        // Convert function declaration to constant declaration with function expression
-        declarationCode = `const ${
-          node.declaration.id.name
-        } = withErrorBoundary(${appDirectoryStr}, function ${
-          node.declaration.id.name
-        }() ${declarationCode.substring(declarationCode.indexOf("{"))});\n`;
-      } else if (
-        node.declaration.declarations[0].init.type === "ArrowFunctionExpression"
-      ) {
-        // Wrap arrow function with withErrorBoundary
-        declarationCode = `const ${
-          node.declaration.declarations[0].id.name
-        } = withErrorBoundary(${appDirectoryStr}, ${declarationCode
-          .substring(declarationCode.indexOf("=") + 1)
-          // Remove the last ";"
-          .replace(/;$/, "")
-          .trim()});`;
+        const declarationCode = code.substring(start, end).replace(/;$/g, "");
+
+        const replacementCode = `const links = withErrorBoundaryLinks(devErrorBoundaryStyles, ${declarationCode})`;
+
+        magicString.overwrite(start, end, replacementCode);
+
+        return;
       }
 
-      magicString.overwrite(start, end, declarationCode);
+      if (node.declaration.type === "VariableDeclaration") {
+        const declarationCode = code
+          .substring(start, end)
+          .replace(/^.*links\s*(?::[^=]+)?=/g, "")
+          .replace(/;$/g, "");
 
+        const replacementCode = `const links = withErrorBoundaryLinks(devErrorBoundaryStyles, ${declarationCode})`;
+
+        magicString.overwrite(start, end, replacementCode);
+        return;
+      }
+
+      throw new Error(
+        "[dev-error-boundary] Unhandled links export type:",
+        node.declaration.type
+      );
+    }
+
+    if (isNamedExport(node, "ErrorBoundary")) {
       errorBoundaryFound = true;
+
+      const [start, end] = node.declaration.range;
+
+      if (node.declaration.type === "FunctionDeclaration") {
+        const declarationCode = code.substring(start, end).replace(/;$/g, "");
+
+        const replacementCode = `const ErrorBoundary = withErrorBoundary(${appDirectoryStr}, ${declarationCode})`;
+
+        magicString.overwrite(start, end, replacementCode);
+
+        return;
+      }
+
+      if (node.declaration.type === "VariableDeclaration") {
+        const declarationCode = code
+          .substring(start, end)
+          .replace(/^.*ErrorBoundary\s*=\s*/g, "")
+          .replace(/;$/g, "");
+
+        const replacementCode = `const ErrorBoundary = withErrorBoundary(${appDirectoryStr}, ${declarationCode})`;
+
+        magicString.overwrite(start, end, replacementCode);
+        return;
+      }
+
+      throw new Error(
+        "[dev-error-boundary] Unhandled ErrorBoundary export type:",
+        node.declaration.type
+      );
     }
   });
 
-  if (!errorBoundaryFound) {
-    magicString.append(
-      `\nexport const ErrorBoundary = withErrorBoundary(${appDirectoryStr});\n`
-    );
-  }
+  // prettier-ignore
+  if (!errorBoundaryFound) magicString.append(`\nexport const ErrorBoundary = withErrorBoundary(${appDirectoryStr});\n`)
+
+  // prettier-ignore
+  if (!linksExportFound && isRoot) magicString.append(`\nexport const links = () => [{ rel: "stylesheet", href: devErrorBoundaryStyles }];\n`);
 
   return {
     code: magicString.toString(),

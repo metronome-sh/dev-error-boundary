@@ -1,7 +1,7 @@
 import { FunctionComponent, SVGProps } from "react";
 import { Svg } from "./Svg";
 
-export const ArrowDownIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
+export const ArrowLeftIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
   props
 ) => {
   return (
@@ -9,7 +9,7 @@ export const ArrowDownIcon: FunctionComponent<SVGProps<SVGSVGElement>> = (
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+        d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
       />
     </Svg>
   );

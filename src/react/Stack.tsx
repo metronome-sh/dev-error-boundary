@@ -1,8 +1,12 @@
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { cn } from "./cn";
-import { ExpandIcon } from "./icon/ExpandIcon";
-import { CollapseIcon } from "./icon/CollapseIcon";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
 
 export interface StackProps {
@@ -55,59 +59,115 @@ export const Stack: FunctionComponent<StackProps> = ({
     );
   }, [stack]);
 
+  // Get from the localstorage the last state of the showFullStack
+  const [showHiddenFrames, setShowHiddenFrames] = useState(false);
+
+  useEffect(() => {
+    // Check localstorage for the last state of the showFullStack
+    const showFullStack = localStorage.getItem(
+      "dev-error-boundary:show-full-stack"
+    );
+    setShowHiddenFrames(showFullStack === "true");
+  }, []);
+
+  const canShowFullStack = stack.some(
+    (frame) =>
+      frame.file === "<anonymous>" ||
+      frame.file?.includes("node:") ||
+      frame.file?.includes("/node_modules/")
+  );
+
+  const handleShowHiddenFrames = (checked: boolean) => {
+    if (!checked) setExpandedIdxs([]);
+    localStorage.setItem("dev-error-boundary:show-full-stack", String(checked));
+    setShowHiddenFrames(checked);
+  };
+
+  const shouldRenderFrame = (
+    frame: stackTraceParser.StackFrame,
+    forceShow = false
+  ) => {
+    if (forceShow) return true;
+
+    const isHiddableFrame =
+      frame.file === "<anonymous>" ||
+      frame.file?.includes("node:") ||
+      frame.file?.includes("/node_modules/");
+
+    return !isHiddableFrame;
+  };
+
   if (error.isErrorResponse) return;
 
   return (
-    <div className="mt-absolute mt-inset-y-0 mt-left-0 mt-w-80 mt-bg-gray-50 mt-border-r mt-border-gray-200 mt-overflow-y-scroll">
-      <button
-        className="mt-text-sm mt-py-3 mt-border-b mt-px-4 mt-bg-white mt-w-full mt-flex mt-gap-2 mt-items-center hover:mt-bg-gray-100 mt-text-gray-500"
-        onClick={expandAllNodeModules}
-      >
-        <span className="mt-text-gray-600">
-          {expandedIdxs.length === 0 ? (
-            <ExpandIcon className="mt-w-4 mt-h-4" />
-          ) : (
-            <CollapseIcon className="mt-w-4 mt-h-4" />
-          )}
-        </span>
-        {expandedIdxs.length === 0 ? "Expand" : "Collapse"}
-        <span className="mt-text-xs mt-leading-4 mt-font-mono mt-border mt-border-gray-300 mt-px-1 mt-py-0.5 mt-rounded">
-          node_modules
-        </span>{" "}
-        frames
-      </button>
-      <ul className="mt-divide-y mt-divide-gray-200 mt-border-b border-b-gray-200">
-        {groupedStack.map((frames, index) => {
-          if (frames.length === 1) {
+    <>
+      <div className="absolute inset-y-0 left-0 w-80 bg-gray-50 border-r border-gray-200 overflow-y-scroll">
+        <div
+          className={cn("text-xs px-4 py-2 bg-white", {
+            hidden: !canShowFullStack,
+          })}
+        >
+          <div className="text-gray-500 mt-2">
+            Some frames were automatically hidden.
+          </div>
+          <div className="relative flex items-start py-1">
+            <div className="flex h-6 items-center">
+              <input
+                id="show-hidden-frames"
+                name="show-hidden-frames"
+                type="checkbox"
+                className="rounded border-gray-300 checked:border-red-700 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-offset-0 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer"
+                onChange={(e) => handleShowHiddenFrames(e.target.checked)}
+                checked={showHiddenFrames}
+              />
+            </div>
+            <div className="ml-2 text-xs leading-6 w-full">
+              <label
+                htmlFor="show-hidden-frames"
+                className="text-gray-900 w-full inline-block cursor-pointer"
+              >
+                Show hidden frames
+              </label>
+            </div>
+          </div>
+        </div>
+        <ul className="divide-y divide-gray-200 border-b border-b-gray-200">
+          {groupedStack.map((frames, index) => {
+            const shouldRender = shouldRenderFrame(frames[0], showHiddenFrames);
+
+            if (!shouldRender) return null;
+
+            if (frames.length === 1) {
+              return (
+                <Frame
+                  key={index}
+                  frame={frames[0]}
+                  onSelectFrame={onSelectFrame}
+                  selectedFrame={selectedFrame}
+                  searchValue={searchValue}
+                />
+              );
+            }
+
             return (
-              <Frame
+              <NodeModulesFrames
                 key={index}
-                frame={frames[0]}
+                frames={frames}
                 onSelectFrame={onSelectFrame}
                 selectedFrame={selectedFrame}
+                onExpand={(next) =>
+                  setExpandedIdxs((prev) =>
+                    next ? [...prev, index] : prev.filter((i) => i !== index)
+                  )
+                }
+                isExpanded={expandedIdxs.includes(index)}
                 searchValue={searchValue}
               />
             );
-          }
-
-          return (
-            <NodeModulesFrames
-              key={index}
-              frames={frames}
-              onSelectFrame={onSelectFrame}
-              selectedFrame={selectedFrame}
-              onExpand={(next) =>
-                setExpandedIdxs((prev) =>
-                  next ? [...prev, index] : prev.filter((i) => i !== index)
-                )
-              }
-              isExpanded={expandedIdxs.includes(index)}
-              searchValue={searchValue}
-            />
-          );
-        })}
-      </ul>
-    </div>
+          })}
+        </ul>
+      </div>
+    </>
   );
 };
 
@@ -134,14 +194,14 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
 
   return (
     <>
-      <li className="mt-text-sm mt-text-gray-500 mt-gap-1">
+      <li className="text-sm text-gray-500 gap-1">
         <button
-          className="mt-w-full mt-text-left mt-py-4 mt-px-4 hover:mt-bg-gray-100 mt-flex mt-items-center mt-justify-between mt-gap-2"
+          className="w-full text-left py-4 px-4 hover:bg-gray-100 flex items-center justify-between gap-2"
           onClick={() => onExpand(!isExpanded)}
         >
           <span>
             <span>{frames.length}</span>{" "}
-            <span className="mt-text-xs mt-leading-4 mt-font-mono mt-border mt-border-gray-300 mt-px-1 mt-py-0.5 mt-rounded">
+            <span className="text-xs leading-4 font-mono border border-gray-300 px-1 py-0.5 rounded">
               node_modules
             </span>{" "}
             frames
@@ -153,8 +213,8 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
                 strokeWidth={2}
                 stroke="currentColor"
                 className={cn(
-                  "mt-ml-2 mt-w-4 mt-h-4 mt-inline",
-                  isExpanded ? "mt-transform mt-rotate-180" : ""
+                  "ml-2 w-4 h-4 inline",
+                  isExpanded ? "transform rotate-180" : ""
                 )}
               >
                 <path
@@ -166,7 +226,7 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
             </span>
           </span>
           {hasSelectedFrame && !isExpanded ? (
-            <span className="mt-w-5 mt-h-5 mt-bg-red-500 mt-inline-block mt-rounded" />
+            <span className="w-5 h-5 bg-red-500 inline-block rounded" />
           ) : null}
         </button>
       </li>
@@ -204,18 +264,18 @@ const Frame: FunctionComponent<FrameProps> = ({
     <li>
       <button
         className={cn(
-          "mt-p-4 mt-w-full mt-text-left",
+          "p-4 w-full text-left",
           selectedFrame?.file === frame.file &&
             selectedFrame?.lineNumber === frame.lineNumber
-            ? "mt-bg-red-600 mt-text-white"
-            : "hover:mt-bg-gray-100 mt-text-gray-700"
+            ? "bg-red-600 text-white"
+            : "hover:bg-gray-100 text-gray-700"
         )}
         onClick={() => onSelectFrame(frame)}
       >
-        <div className="mt-text-sm mt-break-words">
+        <div className="text-sm break-words">
           {frame.file?.replace(searchValue, "")}{" "}
           {frame.file !== "<anonymous>" ? (
-            <span className="mt-font-mono mt-text-xs mt-text-opacity-80">
+            <span className="font-mono text-xs text-opacity-80">
               {frame.lineNumber}:{frame.column}
             </span>
           ) : null}

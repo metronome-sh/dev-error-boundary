@@ -18,7 +18,7 @@ export interface TabProps {
 //   Tab: typeof Tab;
 // } = ({ children }) => {
 //   return (
-//     <div className="mt-z-10 mt-border-b mt-border-gray-200 mt-flex mt-gap-1 mt-text-sm mt-px-4 mt-pt-1">
+//     <div className="z-10 border-b border-gray-200 flex gap-1 text-sm px-4 pt-1">
 //       {children}
 //     </div>
 //   );
@@ -34,18 +34,18 @@ export interface TabProps {
 //     <button
 //       onClick={onSelect}
 //       className={cn(
-//         "mt-overflow-visible mt-relative mt-border mt-pb-1 mt-pt-2 mt-pr-5 mt-pl-4 mt-rounded-t-md mt-flex mt-items-center mt-gap-2",
+//         "overflow-visible relative border pb-1 pt-2 pr-5 pl-4 rounded-t-md flex items-center gap-2",
 //         {
-//           "mt-bg-white": selected,
-//           "mt-text-gray-500 mt-bg-gray-50": !selected,
+//           "bg-white": selected,
+//           "text-gray-500 bg-gray-50": !selected,
 //           "": !selected,
 //         }
 //       )}
 //     >
 //       <div
-//         className={cn("mt-absolute mt-border-b-2 mt-inset-x-0", {
-//           "mt-bottom-[-2px] mt-border-white": selected,
-//           "mt-bottom-[-1px] mt-border-gray-50": !selected,
+//         className={cn("absolute border-b-2 inset-x-0", {
+//           "bottom-[-2px] border-white": selected,
+//           "bottom-[-1px] border-gray-50": !selected,
 //         })}
 //       />
 //       <span>{icon}</span>
@@ -64,10 +64,7 @@ const TabsList = forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
-    className={cn(
-      "mt-inline-flex mt-h-9 mt-pt-1 mt-border-b mt-px-4 mt-w-full mt-gap-1",
-      className
-    )}
+    className={cn("inline-flex h-9 pt-1 border-b px-4 w-full gap-1", className)}
     {...props}
   />
 ));
@@ -81,16 +78,16 @@ const TabsTrigger = forwardRef<
     ref={ref}
     className={cn(
       [
-        "mt-group mt-border mt-border-transparent mt-relative mt-inline-flex mt-items-center mt-justify-center mt-gap-2 mt-whitespace-nowrap mt-rounded-t-md mt-pl-3 mt-pr-4 mt-pt-2 mt-pb-1 mt-text-sm mt-text-gray-500 mt-bg-gray-50 hover:mt-text-gray-600 hover:mt-bg-gray-100",
-        "mt-ring-offset-bg-white mt-transition-all focus-visible:!outline-none focus-visible:ring-2 focus-visible:mt-ring-gray-200",
+        "group border border-transparent relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-t-md pl-3 pr-4 pt-2 pb-1 text-sm text-gray-500 bg-gray-50 hover:text-gray-600 hover:bg-gray-100",
+        "ring-offset-bg-white focus-visible:!outline-none focus-visible:ring-2 focus-visible:ring-gray-200",
         "focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        "data-[state=active]:mt-text-gray-800 data-[state=active]:mt-border-gray-200 data-[state=active]:mt-bg-white data-[state=active]:mt-text-foreground",
+        "data-[state=active]:text-gray-800 data-[state=active]:border-gray-200 data-[state=active]:bg-white data-[state=active]:text-foreground",
       ],
       className
     )}
     {...props}
   >
-    <div className="mt-absolute mt-border-b-2 mt-inset-x-0 mt-bottom-[-1px] mt-border-gray-50 group-data-[state=active]:mt-border-white group-data-[state=active]:mt-bottom-[-2px]" />
+    <div className="absolute border-b-2 inset-x-0 bottom-[-1px] border-gray-50 group-hover:border-gray-100 group-data-[state=active]:border-white group-data-[state=active]:bottom-[-2px]" />
     <span>{icon}</span>
     <span>{children}</span>
   </TabsPrimitive.Trigger>

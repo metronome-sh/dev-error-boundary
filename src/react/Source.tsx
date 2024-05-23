@@ -2,6 +2,8 @@ import { FunctionComponent, useEffect, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { ERROR_BOUNDARY_ROUTE_PATH } from "../common/constants";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
+import { cn } from "./cn";
+import { InfoIcon } from "./icon/InfoIcon";
 
 export interface SourceProps {
   error: DevErrorBoundaryError;
@@ -16,8 +18,11 @@ export const Source: FunctionComponent<SourceProps> = ({
 }) => {
   const [source, setSource] = useState(null);
 
+  const cannotRenderSource =
+    frame?.file === "<anonymous>" || frame?.file?.includes("node:");
+
   useEffect(() => {
-    if (!frame || !frame.file || frame.file === "<anonymous>") return;
+    if (!frame || !frame.file || cannotRenderSource) return;
 
     setSource(null);
 
@@ -26,7 +31,7 @@ export const Source: FunctionComponent<SourceProps> = ({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ frame }),
+      body: JSON.stringify({ frame, appDirectory }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -42,13 +47,13 @@ export const Source: FunctionComponent<SourceProps> = ({
     if (errorLine) {
       errorLine.scrollIntoView({ block: "center" });
     }
-  }, [frame, source]);
+  }, [frame, source, cannotRenderSource]);
 
   if (error.isErrorResponse) {
     return (
       <div>
-        <div className="mt-w-full">
-          <div className="mt-text-red-500 mt-text-sm mt-p-4 mt-w-full">
+        <div className="w-full">
+          <div className="text-red-500 text-sm p-4 w-full">
             <code>
               <pre>{error.message}</pre>
             </code>
@@ -60,14 +65,14 @@ export const Source: FunctionComponent<SourceProps> = ({
 
   if (!source) {
     return (
-      <div className="mt-flex mt-justify-center mt-py-20 mt-text-gray-400 mt-w-full">
+      <div className="flex justify-center py-20 text-gray-400 w-full">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="mt-w-6 mt-h-6 mt-animate-spin"
+          className="w-6 h-6 animate-spin"
         >
           <path
             strokeLinecap="round"
@@ -79,34 +84,44 @@ export const Source: FunctionComponent<SourceProps> = ({
     );
   }
 
-  const isAnonymous = frame?.file === "<anonymous>";
-
   return (
-    <div className="mt-text-sm mt-h-full mt-w-full mt-flex-1">
-      {isAnonymous ? (
-        <div className="mt-p-3">
-          <span className="mt-font-mono">
-            <span className="mt-text-gray-600">method: </span>
-            {frame.methodName}
+    <div className="text-sm h-full w-full flex-1 flex flex-col">
+      {error.reactBound ? (
+        <div className="py-2 border-b bg-amber-100 flex items-start px-4 gap-1 flex-shrink-0">
+          <InfoIcon strokeWidth={2} className="text-amber-600 mt-0.5" />
+          <span className="font-medium text-amber-900">
+            There is a known issue with the line numbers of the stack trace when
+            the error occurs in a React component. We are working on a fix.
           </span>
         </div>
+      ) : null}
+      {cannotRenderSource ? (
+        <div className="p-3">
+          <pre className="font-mono">
+            {frame?.methodName ?? "Unable to render source"}
+          </pre>
+        </div>
       ) : (
-        <div className="mt-h-full mt-relative">
-          <div className="mt-absolute mt-top-0 mt-inset-x-0 mt-bg-white mt-border-b mt-z-10 mt-h-7 mt-flex mt-items-center mt-justify-end mt-px-4 mt-w-full">
+        <div className="relative flex-grow">
+          <div
+            className={cn(
+              "absolute top-0 inset-x-0 bg-white border-b z-10 h-7 flex items-center justify-end px-4 w-full"
+            )}
+          >
             <span
-              className="mt-text-gray-400 mt-font-mono mt-truncate mt-rtl"
+              className="text-gray-400 font-mono truncate rtl"
               style={{ direction: "rtl" }}
             >
               {frame?.file?.replace(appDirectory, "").replace(/^\//, "")}
-              <span className="mt-text-transparent">:</span>
-              <span className="mt-font-mono mt-text-xs">
+              <span className="text-transparent">:</span>
+              <span className="font-mono text-xs">
                 {frame?.lineNumber}:{frame?.column}
               </span>
             </span>
           </div>
-          <div className="mt-absolute mt-inset-0 mt-top-7 mt-overflow-scroll">
+          <div className="absolute inset-0 top-7 overflow-scroll">
             <div
-              className="mt-w-full *:mt-py-3 *:!mt-bg-transparent mt-bg-white *:mt-w-full [&>pre]:mt-w-full [&>pre]:mt-min-w-fit"
+              className="w-full *:py-3 *:!bg-transparent bg-white *:w-full [&>pre]:w-full [&>pre]:min-w-fit"
               data-error-code-container="true"
               dangerouslySetInnerHTML={{ __html: source }}
             />

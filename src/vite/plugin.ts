@@ -5,15 +5,12 @@ import { transformEntryServer } from "./transformEntryServer";
 
 let remixPluginContext: any;
 
+let routes: string[] = [];
+
 export const devErrorBoundary: (config?: never) => PluginOption = () => {
   function isRouteFile(id: string) {
-    if (!remixPluginContext) return false;
-
-    const { routes } = remixPluginContext.remixConfig;
-
-    const routeFiles = Object.values(routes).map((route: any) => route.file);
-
-    return routeFiles.some((routeFile: string) => id.endsWith(routeFile));
+    const isRoute = routes.some((routeFile: string) => id.endsWith(routeFile));
+    return isRoute;
   }
 
   function isNotResourceRoute(code: string) {
@@ -29,6 +26,15 @@ export const devErrorBoundary: (config?: never) => PluginOption = () => {
       if (__remixPluginContext) remixPluginContext = __remixPluginContext;
     },
     transform(code, id) {
+      if (id.match(/virtual:remix\/server-build/)) {
+        return transformServer({
+          code,
+          id,
+          onRoutes: (routePaths) => (routes = routePaths),
+        });
+      }
+
+      // Transform the entry.server file to wrap the handleError function
       if (id.match(/entry\.server\./)) {
         return transformEntryServer({ code, id });
       }
@@ -39,10 +45,6 @@ export const devErrorBoundary: (config?: never) => PluginOption = () => {
       ) {
         const { appDirectory } = remixPluginContext.remixConfig;
         return transformRoute({ code, id, appDirectory });
-      }
-
-      if (id.match(/virtual:remix\/server-build/)) {
-        return transformServer(code, id);
       }
     },
   };

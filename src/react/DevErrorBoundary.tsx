@@ -1,10 +1,4 @@
-import {
-  FunctionComponent,
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { Source } from "./Source";
 import { Stack } from "./Stack";
@@ -17,14 +11,13 @@ import { Tabs } from "./Tabs";
 import { cn } from "./cn";
 import { Context } from "./Context";
 
-export interface DevErrorBoundaryProps extends PropsWithChildren {
-  hasErrorBoundary?: boolean;
+export interface DevErrorBoundaryProps {
+  onRenderOriginalErrorBoundary?: () => void;
   appDirectory: string;
 }
 
 export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
-  children,
-  hasErrorBoundary,
+  onRenderOriginalErrorBoundary,
   appDirectory,
 }) => {
   const error = useDevBoundaryError();
@@ -35,70 +28,71 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
     return stackTraceParser.parse(error.stack);
   }, [error]);
 
-  const [showOriginalErrorBoundary, setShowOriginalErrorBoundary] =
-    useState(false);
-  const [readyToRender, setReadyToRender] = useState(false);
-
   const [selectedFrame, setSelectedFrame] =
     useState<stackTraceParser.StackFrame | null>(() => stack[0] || null);
 
-  useEffect(() => {
-    if (showOriginalErrorBoundary) return;
+  // useEffect(() => {
+  //   const styles = document.querySelectorAll(
+  //     "link[rel=stylesheet]"
+  //   ) as NodeListOf<HTMLLinkElement>;
 
-    document.documentElement.classList.add("dev-error-boundary");
-    setReadyToRender(true);
+  //   // Disable all styles except the dev-error-boundary styles
+  //   styles.forEach((style) => {
+  //     if (style.id === "dev-error-boundary-styles") style.disabled = false;
+  //     else style.disabled = true;
+  //   });
 
-    return () => {
-      document.documentElement.classList.remove("dev-error-boundary");
-    };
-  }, [showOriginalErrorBoundary]);
-
-  if (showOriginalErrorBoundary) {
-    return children;
-  }
-
-  if (!readyToRender) return null;
+  //   return () => {
+  //     // Re-enable all styles and disable the dev-error-boundary styles
+  //     styles.forEach((style) => {
+  //       if (style.id === "dev-error-boundary-styles") style.disabled = true;
+  //       else style.disabled = false;
+  //     });
+  //   };
+  // }, []);
 
   return (
-    <div className="mt-bg-zinc-50 mt-h-screen mt-py-6">
-      <div className="mt-bg-white mt-flex mt-flex-col mt-max-w-screen-xl mt-mx-auto mt-border mt-shadow-md mt-h-full mt-rounded-lg mt-overflow-hidden">
-        {hasErrorBoundary ? (
-          <ExistingErrorBoundaryBanner
-            setShowOriginalErrorBoundary={setShowOriginalErrorBoundary}
-          />
-        ) : null}
-        <ErrorHeader error={error} />
-        <Tabs defaultValue="stack" className="mt-flex mt-flex-col mt-flex-grow">
-          <Tabs.List className="mt-flex-shrink-0">
-            <Tabs.Trigger icon={<StackIcon />} value="stack">
-              Stack
-            </Tabs.Trigger>
-            <Tabs.Trigger icon={<ContextIcon />} value="context">
-              Context
-            </Tabs.Trigger>
-          </Tabs.List>
-          <Tabs.Content
-            value="stack"
-            className={cn("mt-relative mt-flex-grow mt-w-full", {
-              "mt-pl-80": !error.isErrorResponse,
-            })}
-          >
-            <Stack
-              error={error}
-              appDirectory={appDirectory}
-              onSelectFrame={(frame) => setSelectedFrame(frame)}
-              selectedFrame={selectedFrame}
+    <div className="dev-error-boundary" style={{ display: "none" }}>
+      <div className="bg-zinc-50 !absolute inset-0">
+        <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
+          {onRenderOriginalErrorBoundary ? (
+            <ExistingErrorBoundaryBanner
+              setShowOriginalErrorBoundary={onRenderOriginalErrorBoundary}
             />
-            <Source
-              error={error}
-              appDirectory={appDirectory}
-              frame={selectedFrame}
-            />
-          </Tabs.Content>
-          <Tabs.Content value="context" className="mt-flex-grow">
-            <Context error={error} />
-          </Tabs.Content>
-        </Tabs>
+          ) : null}
+          <ErrorHeader error={error} />
+          <Tabs defaultValue="stack" className="flex flex-col flex-grow">
+            <Tabs.List className="flex-shrink-0">
+              <Tabs.Trigger icon={<StackIcon />} value="stack">
+                Stack
+              </Tabs.Trigger>
+              <Tabs.Trigger icon={<ContextIcon />} value="context">
+                Context
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content
+              value="stack"
+              className={cn("relative flex-grow w-full", {
+                "pl-80": !error.isErrorResponse,
+              })}
+            >
+              <Stack
+                error={error}
+                appDirectory={appDirectory}
+                onSelectFrame={(frame) => setSelectedFrame(frame)}
+                selectedFrame={selectedFrame}
+              />
+              <Source
+                error={error}
+                appDirectory={appDirectory}
+                frame={selectedFrame}
+              />
+            </Tabs.Content>
+            <Tabs.Content value="context" className="flex-grow">
+              <Context error={error} />
+            </Tabs.Content>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

@@ -34,6 +34,13 @@ export default defineConfig({
 
 3. Done and done.
 
+## Known bugs
+
+1. In certain scenarios, errors in React components contain the wrong line where the error happened.
+2. Errors thrown directly in the root.tsx component might not be catch by the Error Boundary.
+
+If you find more bugs, please feel free to open an issue.
+
 ## Contributing
 
 WIP
