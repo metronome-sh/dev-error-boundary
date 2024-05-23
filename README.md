@@ -2,7 +2,7 @@
 
 ![Banner](./banner.png)
 
-Dev Error Boundary is a vite plugin that enhances the errors thrown and catched by your Remix app.
+Dev Error Boundary is a vite plugin that enhances the errors thrown and caught by your Remix app.
 
 Instead of showing you a default [ErrorBoundary](https://remix.run/docs/en/main/route/error-boundary), you get a better and more descriptive error boundary during development.
 
