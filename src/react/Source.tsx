@@ -1,6 +1,6 @@
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
-import { ERROR_BOUNDARY_ROUTE_PATH } from "../common/constants";
+import { ERROR_BOUNDARY_ROUTE_PATH_SOURCE } from "../common/constants";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
 import { cn } from "./cn";
 import { InfoIcon } from "./icon/InfoIcon";
@@ -26,7 +26,7 @@ export const Source: FunctionComponent<SourceProps> = ({
 
     setSource(null);
 
-    fetch(ERROR_BOUNDARY_ROUTE_PATH, {
+    fetch(ERROR_BOUNDARY_ROUTE_PATH_SOURCE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,6 +48,12 @@ export const Source: FunctionComponent<SourceProps> = ({
       errorLine.scrollIntoView({ block: "center" });
     }
   }, [frame, source, cannotRenderSource]);
+
+  const reactError = useMemo(() => {
+    return error.stack.some((frame) => {
+      return frame.file?.startsWith("http");
+    });
+  }, [error.stack]);
 
   if (error.isErrorResponse) {
     return (
@@ -86,12 +92,13 @@ export const Source: FunctionComponent<SourceProps> = ({
 
   return (
     <div className="text-sm h-full w-full flex-1 flex flex-col">
-      {error.reactBound ? (
+      {reactError ? (
         <div className="py-2 border-b bg-amber-100 flex items-start px-4 gap-1 flex-shrink-0">
           <InfoIcon strokeWidth={2} className="text-amber-600 mt-0.5" />
           <span className="font-medium text-amber-900">
             There is a known issue with the line numbers of the stack trace when
-            the error occurs in a React component. We are working on a fix.
+            an error sometimes occurs in a React component. We are working on a
+            fix.
           </span>
         </div>
       ) : null}

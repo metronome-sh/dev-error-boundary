@@ -3,6 +3,7 @@ import { DevErrorBoundaryError } from "./useDevBoundaryError";
 import { ArrowDownIcon } from "./icon/ArrowDownIcon";
 import { codeToHtml } from "shiki";
 import { cn } from "./cn";
+import { ERROR_BOUNDARY_ERROR_CONTEXT } from "../common/constants";
 
 export interface ContextProps {
   error: DevErrorBoundaryError;
@@ -21,26 +22,37 @@ export const Context: FunctionComponent<ContextProps> = ({ error }) => {
 
   useEffect(() => {
     if (error.context) {
-      codeToHtml(error.context, {
-        lang: "json",
-        theme: "light-plus",
-      }).then((html) => {
-        setContextCode(html);
-      });
+      codeToHtml(error.context, { lang: "json", theme: "light-plus" }).then(
+        (html) => setContextCode(html)
+      );
     }
-  }, [error]);
+  }, [error.context]);
 
   // Put important headers first
   const sortedHeaders = useMemo(() => {
+    if (!error.request?.headers) return [];
+
     return error.request.headers.slice().sort(([a], [b]) => {
       return (
         importantHeaders.indexOf(b.toLowerCase()) -
         importantHeaders.indexOf(a.toLowerCase())
       );
     });
-  }, [error.request.headers]);
+  }, [error.request?.headers]);
 
   const [showAllHeaders, setShowAllHeaders] = useState(false);
+
+  if (
+    error.request === null ||
+    error.context === null ||
+    error.params === null
+  ) {
+    return (
+      <div className="text-gray-500 p-4 text-center text-sm">
+        No context available
+      </div>
+    );
+  }
 
   return (
     <div className="h-full relative">

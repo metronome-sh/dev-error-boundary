@@ -1,5 +1,8 @@
+import * as stackTraceParser from "stacktrace-parser";
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ERROR_BOUNDARY_ERROR_CONTEXT } from "../common/constants";
+import { simpleHash } from "../common/simpleHash";
 
 export interface DevErrorBoundaryErrorBase {
   message: string;
@@ -8,14 +11,13 @@ export interface DevErrorBoundaryErrorBase {
     url: string;
     headers: [string, string][];
     body: string;
-  };
-  context: string;
-  params: Record<string, string>;
-  reactBound: boolean;
+  } | null;
+  context: string | null;
+  params: Record<string, string> | null;
+  stack: stackTraceParser.StackFrame[];
 }
 
 export type DevErrorBoudaryErrorResponse = DevErrorBoundaryErrorBase & {
-  stack: never;
   isErrorResponse: true;
   response: {
     status: number;
@@ -24,7 +26,6 @@ export type DevErrorBoudaryErrorResponse = DevErrorBoundaryErrorBase & {
 };
 
 export type DevErrorBoundaryRegularError = DevErrorBoundaryErrorBase & {
-  stack: string;
   isErrorResponse: false;
 };
 
@@ -34,50 +35,51 @@ export type DevErrorBoundaryError =
 
 // This hook should be used only at top level of the Error Boundary as it replaces the error object
 // Once it gets parsed, it should be passed down to the children components as props
-export function useDevBoundaryError(): DevErrorBoundaryError {
+export function useDevBoundaryError(): DevErrorBoundaryError | null {
   const error = useRouteError();
+  const [context, setContext] = useState<any | null | undefined>(undefined);
+
+  useEffect(() => {
+    const hash = isRouteErrorResponse(error)
+      ? simpleHash(error.data + error.status + error.statusText)
+      : simpleHash((error as Error).message + (error as Error).stack);
+
+    fetch(ERROR_BOUNDARY_ERROR_CONTEXT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hash }),
+    })
+      .then((response) => response.json())
+      .then((data) => setContext(data.context));
+  }, [error]);
 
   return useMemo(() => {
-    try {
-      if (isRouteErrorResponse(error)) {
-        const { __dev_error_boundary = null } = JSON.parse(error.data) as {
-          __dev_error_boundary?: DevErrorBoundaryError;
-        };
+    // Loading context
+    if (context === undefined) return null;
 
-        if (!__dev_error_boundary) {
-          throw new Error("Dev error boundary error cannot be parsed.");
-        }
-        __dev_error_boundary.isErrorResponse = true;
+    if (isRouteErrorResponse(error)) {
+      const responseError: DevErrorBoudaryErrorResponse = {
+        message: error.data,
+        request: context?.request ?? null,
+        context: context?.context ?? null,
+        params: context?.params ?? null,
+        isErrorResponse: true,
+        stack: [],
+        response: { status: error.status, statusText: error.statusText },
+      };
 
-        return __dev_error_boundary;
-      } else if (error instanceof Error) {
-        const { __dev_error_boundary = null } = JSON.parse(error.message) as {
-          __dev_error_boundary?: DevErrorBoundaryError;
-        };
-
-        if (!__dev_error_boundary) {
-          throw new Error("Dev error boundary error cannot be parsed.");
-        }
-
-        __dev_error_boundary.isErrorResponse = false;
-        __dev_error_boundary.stack = error.stack || "";
-
-        return __dev_error_boundary;
-      }
-
-      throw new Error("Error is not an instance of Error or ErrorResponse.");
-    } catch (e) {
-      // console.log({ error });
-
-      return {
+      return responseError;
+    } else {
+      const regularError: DevErrorBoundaryRegularError = {
         message: (error as Error).message,
-        request: { method: "", url: "", headers: [], body: "" },
-        context: "",
-        params: {},
-        stack: (error as Error).stack || "",
+        request: context?.request ?? null,
+        context: context?.context ?? null,
+        params: context?.params ?? null,
         isErrorResponse: false,
-        reactBound: true,
-      } as DevErrorBoundaryRegularError;
+        stack: stackTraceParser.parse((error as Error).stack || ""),
+      };
+
+      return regularError;
     }
-  }, [error]);
+  }, [context]);
 }

@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import * as stackTraceParser from "stacktrace-parser";
 import { Source } from "./Source";
 import { Stack } from "./Stack";
@@ -22,20 +22,30 @@ export const DevErrorBoundary: FunctionComponent<DevErrorBoundaryProps> = ({
 }) => {
   const error = useDevBoundaryError();
 
-  const stack = useMemo(() => {
-    if (error.isErrorResponse) return [];
+  const [selectedFrame, setSelectedFrame] =
+    useState<stackTraceParser.StackFrame | null>(null);
 
-    return stackTraceParser.parse(error.stack);
+  useEffect(() => {
+    // Find the first frame that is not anonymous, or node_modules or not a node:
+
+    const found = error?.stack.find((frame) => {
+      return (
+        frame.file !== "<anonymous>" &&
+        !frame.file?.includes("node_modules") &&
+        !frame.file?.includes("node:")
+      );
+    });
+
+    setSelectedFrame(found ?? error?.stack[0] ?? null);
   }, [error]);
 
-  const [selectedFrame, setSelectedFrame] =
-    useState<stackTraceParser.StackFrame | null>(() => stack[0] || null);
+  if (!error) return null;
 
   return (
     <div className="dev-error-boundary" style={{ display: "none" }}>
       <div className="bg-zinc-50 !absolute inset-0 z-[2147483647]">
         <div className="bg-white flex flex-col w-full border shadow-md h-full overflow-hidden">
-          {onRenderOriginalErrorBoundary ? (
+          {onRenderOriginalErrorBoundary != undefined ? (
             <ExistingErrorBoundaryBanner
               setShowOriginalErrorBoundary={onRenderOriginalErrorBoundary}
             />

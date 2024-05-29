@@ -26,17 +26,11 @@ export const Stack: FunctionComponent<StackProps> = ({
 
   const searchValue = appDirectory.split("/").slice(0, -1).join("/");
 
-  const stack = useMemo(() => {
-    if (error.isErrorResponse) return [];
-
-    return stackTraceParser.parse(error.stack);
-  }, [error]);
-
   const groupedStack = useMemo(() => {
-    return stack.reduce(
+    return error.stack.reduce(
       (acc: stackTraceParser.StackFrame[][], frame, index) => {
         const currentFile = frame.file || "";
-        const prevFile = index > 0 ? stack[index - 1].file || "" : "";
+        const prevFile = index > 0 ? error.stack[index - 1].file || "" : "";
 
         const isNodeModule = currentFile.includes("node_modules");
         const isPrevNodeModule = prevFile.includes("node_modules");
@@ -51,13 +45,13 @@ export const Stack: FunctionComponent<StackProps> = ({
       },
       []
     );
-  }, [stack]);
+  }, [error.stack]);
 
   const expandAllNodeModules = useCallback(() => {
     setExpandedIdxs((prev) =>
-      prev.length === 0 ? stack.map((_, i) => i) : []
+      prev.length === 0 ? error.stack.map((_, i) => i) : []
     );
-  }, [stack]);
+  }, [error.stack]);
 
   // Get from the localstorage the last state of the showFullStack
   const [showHiddenFrames, setShowHiddenFrames] = useState(false);
@@ -70,7 +64,7 @@ export const Stack: FunctionComponent<StackProps> = ({
     setShowHiddenFrames(showFullStack === "true");
   }, []);
 
-  const canShowFullStack = stack.some(
+  const canShowFullStack = error.stack.some(
     (frame) =>
       frame.file === "<anonymous>" ||
       frame.file?.includes("node:") ||

@@ -1,5 +1,17 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.6
+
+### Patch Changes
+
+- refactored how the error context is determined
+
+## 0.0.6-prerelease.0
+
+### Patch Changes
+
+- refactored how the error context is determined
+
 ## 0.0.5
 
 ### Patch Changes
