@@ -6,7 +6,7 @@ Dev Error Boundary is a vite plugin that enhances the errors thrown and caught b
 
 Instead of showing you a default [ErrorBoundary](https://remix.run/docs/en/main/route/error-boundary), you get a better and more descriptive error boundary during development.
 
-Dev Error Boundary will only be active during development, dev error boundary code does not leave any fingerprint at build time.
+Dev Error Boundary will only be active during development. Dev error boundary code does not leave any fingerprint at build time.
 
 ## Getting started
 
