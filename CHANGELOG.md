@@ -1,5 +1,31 @@
 # @metronome-sh/dev-error-boundary
 
+## 0.0.10
+
+### Patch Changes
+
+- styling
+
+## 0.0.9
+
+### Patch Changes
+
+- Styling fixes
+
+## 0.0.8
+
+### Patch Changes
+
+- Style fixes
+
+## 0.0.7
+
+### Patch Changes
+
+- Dark Mode
+  Improved params context section
+  Other fixes
+
 ## 0.0.6
 
 ### Patch Changes

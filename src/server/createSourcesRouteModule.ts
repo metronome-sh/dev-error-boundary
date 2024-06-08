@@ -12,9 +12,10 @@ const unableToAccess =
 
 export function createSourcesRouteModule() {
   const action: ActionFunction = async ({ request, context, params }) => {
-    const { frame, appDirectory } = (await request.json()) as {
+    const { frame, appDirectory, theme } = (await request.json()) as {
       frame: stackTraceParser.StackFrame;
       appDirectory: string;
+      theme: string;
     };
 
     if (!frame || !frame.file) {
@@ -49,7 +50,7 @@ export function createSourcesRouteModule() {
 
     const source = await codeToHtml(code, {
       lang: "tsx",
-      theme: "light-plus",
+      theme: theme === "dark" ? "github-dark" : "github-light",
       transformers: [
         {
           line(node, line) {

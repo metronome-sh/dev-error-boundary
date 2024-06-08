@@ -5,7 +5,7 @@ import { simpleHash } from "../common/simpleHash";
 const replacer = (key: string, value: any) => {
   // Handle functions
   if (typeof value === "function") {
-    return `[Function ${value.toString()}]`;
+    return `[Function ${value.name}]`;
   }
 
   // Handle BigInts

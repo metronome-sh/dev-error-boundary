@@ -95,13 +95,13 @@ export const Stack: FunctionComponent<StackProps> = ({
 
   return (
     <>
-      <div className="absolute inset-y-0 left-0 w-80 bg-gray-50 border-r border-gray-200 overflow-y-scroll">
+      <div className="absolute inset-y-0 left-0 w-80 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-scroll">
         <div
-          className={cn("text-xs px-4 py-2 bg-white", {
+          className={cn("text-xs px-4 py-2 bg-white dark:bg-gray-800", {
             hidden: !canShowFullStack,
           })}
         >
-          <div className="text-gray-500 mt-2">
+          <div className="text-gray-500 dark:text-gray-300 mt-2">
             Some frames were automatically hidden.
           </div>
           <div className="relative flex items-start py-1">
@@ -110,7 +110,11 @@ export const Stack: FunctionComponent<StackProps> = ({
                 id="show-hidden-frames"
                 name="show-hidden-frames"
                 type="checkbox"
-                className="rounded border-gray-300 checked:border-red-700 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-offset-0 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer"
+                className={cn(
+                  "rounded border-gray-300 focus:ring focus:ring-offset-0 shadow-sm focus:ring-opacity-50 cursor-pointer",
+                  "checked:border-red-700 text-red-600 focus:border-red-300 focus:ring-red-200",
+                  "dark:checked:border-red-700 dark:text-red-500 dark:focus:border-red-300 dark:focus:ring-red-200"
+                )}
                 onChange={(e) => handleShowHiddenFrames(e.target.checked)}
                 checked={showHiddenFrames}
               />
@@ -118,14 +122,14 @@ export const Stack: FunctionComponent<StackProps> = ({
             <div className="ml-2 text-xs leading-6 w-full">
               <label
                 htmlFor="show-hidden-frames"
-                className="text-gray-900 w-full inline-block cursor-pointer"
+                className="text-gray-900 dark:text-gray-100 w-full inline-block cursor-pointer"
               >
                 Show hidden frames
               </label>
             </div>
           </div>
         </div>
-        <ul className="divide-y divide-gray-200 border-b border-b-gray-200">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-600 border-b border-b-gray-200 dark:border-b-gray-600">
           {groupedStack.map((frames, index) => {
             const shouldRender = shouldRenderFrame(frames[0], showHiddenFrames);
 
@@ -188,14 +192,14 @@ const NodeModulesFrames: FunctionComponent<NodeModulesFramesProps> = ({
 
   return (
     <>
-      <li className="text-sm text-gray-500 gap-1">
+      <li className="text-sm text-gray-500 dark:text-gray-300 gap-1">
         <button
-          className="w-full text-left py-4 px-4 hover:bg-gray-100 flex items-center justify-between gap-2"
+          className="w-full text-left py-4 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between gap-2"
           onClick={() => onExpand(!isExpanded)}
         >
           <span>
             <span>{frames.length}</span>{" "}
-            <span className="text-xs leading-4 font-mono border border-gray-300 px-1 py-0.5 rounded">
+            <span className="text-xs leading-4 font-mono border border-gray-300 dark:border-gray-600 px-1 py-0.5 rounded">
               node_modules
             </span>{" "}
             frames
@@ -261,8 +265,8 @@ const Frame: FunctionComponent<FrameProps> = ({
           "p-4 w-full text-left",
           selectedFrame?.file === frame.file &&
             selectedFrame?.lineNumber === frame.lineNumber
-            ? "bg-red-600 text-white"
-            : "hover:bg-gray-100 text-gray-700"
+            ? "bg-red-600 text-white dark:bg-red-600/80"
+            : "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
         )}
         onClick={() => onSelectFrame(frame)}
       >

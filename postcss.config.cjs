@@ -12,6 +12,12 @@ module.exports = {
         if (/^(body|html|:root)/.test(selector)) {
           return selector.replace(/^(body|html|:root)/, `$1 ${prefix}`);
         }
+
+        // if (!selector.startsWith(".dark")) {
+        //   console.log({ prefix, selector, prefixedSelector });
+        //   return `${prefix} .light ${selector}`;
+        // }
+
         return prefixedSelector;
       },
     }),

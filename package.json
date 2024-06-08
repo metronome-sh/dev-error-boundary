@@ -1,6 +1,6 @@
 {
   "name": "@metronome-sh/dev-error-boundary",
-  "version": "0.0.6",
+  "version": "0.0.10",
   "description": "Remix dev error boundary",
   "type": "module",
   "files": [
@@ -40,7 +40,8 @@
     "shiki": "^1.5.2",
     "source-map": "^0.7.4",
     "stacktrace-parser": "^0.1.10",
-    "tailwind-merge": "^2.3.0"
+    "tailwind-merge": "^2.3.0",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.2",

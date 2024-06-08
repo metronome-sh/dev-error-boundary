@@ -12,10 +12,10 @@ export const ExistingErrorBoundaryBanner: FunctionComponent<
   const error = useRouteError();
 
   return (
-    <div className="text-xs text-gray-600 flex gap-2 border-b p-2 justify-center items-center">
+    <div className="h-11 text-xs text-gray-600 dark:text-gray-400 flex gap-2 border-b dark:border-gray-700 p-2 justify-center items-center">
       <span>Existing error boundary detected.</span>
       <span
-        className="cursor-pointer text-blue-600"
+        className="cursor-pointer text-blue-600 dark:text-blue-400"
         onClick={() => {
           if (isRouteErrorResponse(error)) {
             const parsed = JSON.parse(error.data);

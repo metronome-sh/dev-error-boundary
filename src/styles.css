@@ -441,7 +441,7 @@ video {
   left: 0;
   right: 0;
   bottom: 0;
-  @apply bg-red-600/10;
+  @apply bg-red-600/20 dark:bg-red-600/30;
   z-index: -1;
 }
 

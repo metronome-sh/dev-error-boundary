@@ -7,9 +7,9 @@ interface ErrorHeaderProps {
 
 export const ErrorHeader: FunctionComponent<ErrorHeaderProps> = ({ error }) => {
   return (
-    <div className="px-5 py-3 mb-3 flex border-b border-gray-100">
+    <div className="px-5 py-3 mb-3 flex border-b border-gray-100 dark:border-gray-700">
       <div className="flex-grow">
-        <div className="text-sm text-red-600">
+        <div className="text-sm text-red-600 dark:text-red-400">
           <span className="mr-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +26,7 @@ export const ErrorHeader: FunctionComponent<ErrorHeaderProps> = ({ error }) => {
           </span>
           Application Error
         </div>
-        <div className="text-lg font-semibold">
+        <div className="text-lg font-semibold dark:text-gray-50 max-h-28 overflow-y-scroll">
           {error.isErrorResponse
             ? `${error.response.status} ${error.response.statusText}`
             : error.message}

@@ -12,6 +12,7 @@ const spacing = Array.from(Array(1001).keys()).reduce(
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ["class", ".dev-error-boundary-dark"],
   content: ["./src/**/*.tsx", "./src/**/*.ts"],
   important: true,
   corePlugins: {

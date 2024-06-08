@@ -4,6 +4,7 @@ import { ERROR_BOUNDARY_ROUTE_PATH_SOURCE } from "../common/constants";
 import { DevErrorBoundaryError } from "./useDevBoundaryError";
 import { cn } from "./cn";
 import { InfoIcon } from "./icon/InfoIcon";
+import { useTheme } from "./useTheme";
 
 export interface SourceProps {
   error: DevErrorBoundaryError;
@@ -16,6 +17,7 @@ export const Source: FunctionComponent<SourceProps> = ({
   appDirectory,
   frame,
 }) => {
+  const { theme } = useTheme();
   const [source, setSource] = useState(null);
 
   const cannotRenderSource =
@@ -31,13 +33,13 @@ export const Source: FunctionComponent<SourceProps> = ({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ frame, appDirectory }),
+      body: JSON.stringify({ frame, appDirectory, theme }),
     })
       .then((response) => response.json())
       .then((data) => {
         setSource(data.source);
       });
-  }, [frame]);
+  }, [frame, theme]);
 
   useEffect(() => {
     if (!frame) return;
@@ -57,7 +59,7 @@ export const Source: FunctionComponent<SourceProps> = ({
 
   if (error.isErrorResponse) {
     return (
-      <div>
+      <div className="h-full dark:bg-gray-800">
         <div className="w-full">
           <div className="text-red-500 text-sm p-4 w-full">
             <code>
@@ -93,9 +95,12 @@ export const Source: FunctionComponent<SourceProps> = ({
   return (
     <div className="text-sm h-full w-full flex-1 flex flex-col">
       {reactError ? (
-        <div className="py-2 border-b bg-amber-100 flex items-start px-4 gap-1 flex-shrink-0">
-          <InfoIcon strokeWidth={2} className="text-amber-600 mt-0.5" />
-          <span className="font-medium text-amber-900">
+        <div className="py-2 border-b dark:border-gray-600 bg-amber-100 dark:bg-gray-900 flex items-start px-4 gap-1 flex-shrink-0">
+          <InfoIcon
+            strokeWidth={2}
+            className="text-amber-600 dark:text-amber-500 mt-0.5"
+          />
+          <span className="font-medium text-amber-900 dark:text-amber-500">
             There is a known issue with the line numbers of the stack trace when
             an error sometimes occurs in a React component. We are working on a
             fix.
@@ -112,11 +117,11 @@ export const Source: FunctionComponent<SourceProps> = ({
         <div className="relative flex-grow">
           <div
             className={cn(
-              "absolute top-0 inset-x-0 bg-white border-b z-10 h-7 flex items-center justify-end px-4 w-full"
+              "absolute top-0 inset-x-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600 z-10 h-7 flex items-center justify-end px-4 w-full"
             )}
           >
             <span
-              className="text-gray-400 font-mono truncate rtl"
+              className="text-gray-400 dark:text-gray-300 font-mono truncate rtl"
               style={{ direction: "rtl" }}
             >
               {frame?.file?.replace(appDirectory, "").replace(/^\//, "")}
@@ -128,7 +133,7 @@ export const Source: FunctionComponent<SourceProps> = ({
           </div>
           <div className="absolute inset-0 top-7 overflow-scroll">
             <div
-              className="w-full *:py-3 *:!bg-transparent bg-white *:w-full [&>pre]:w-full [&>pre]:min-w-fit"
+              className="w-full *:py-3 *:!bg-transparent bg-white dark:bg-gray-900 *:w-full [&>pre]:w-full [&>pre]:min-w-fit"
               data-error-code-container="true"
               dangerouslySetInnerHTML={{ __html: source }}
             />
